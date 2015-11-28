@@ -1,0 +1,116 @@
+header
+{
+    background: #32383f;
+    height: 75px;
+}
+fieldset
+{
+    height:100%;
+    margin: 0 auto;
+}
+body,textarea,input,select
+{
+    font-family: Tahoma, Geneva, sans-serif;
+    font-size: 16;
+    color: #32383f;
+    line-height: 18px;
+    position: relative;
+    margin: 0px;
+}
+#TT
+{
+    float: left;
+    font-size: 14px;
+	line-height: 10px;
+}
+#exp
+{
+	top: 12px;
+    line-height: 15px;
+    font-size: 14;    
+    width: 15px;
+    height: 245px;
+    resize: none;
+    float: left;
+}
+#TruthTable
+{
+    width: 58px;
+    line-height: 15px;
+    font-size: 16px;
+    height: 250px;
+    border: none;
+    resize: none;
+    float: left;
+}
+.data
+{
+    float: right;
+	margin: auto;
+}
+#ret
+{
+    width: 920px;
+    height: 90%;
+    resize: none;
+}
+#interface
+{
+    top: 100px;
+    width: 1000px;
+    height: 90%;
+    margin: 0 auto;
+}
+#input
+{
+    width: 374px;
+    height: 430px;
+    float: left;
+    margin: 5px;
+}
+#karnaugh
+{
+    height: 430px;
+    width: 606px;
+    float: left;
+    margin: 5px;
+	margin-right: 0px;
+}
+#output
+{
+    width: 990px;
+    height: 300px;
+    float: left;
+    margin: 5px;
+    margin-top:15px;
+	margin-bottom: 40px;
+}
+#author
+{
+	display: block;
+	font-family: comic sans;
+    width: 370px;
+    height: 30px;
+	margin-bottom:20px;
+	margin: 0 auto;
+}
+#container
+{
+	float:left;
+	position: relative;
+	margin: 0;
+}
+#KarnaughSetings
+{
+	text-align: center;
+	float: right;
+	width: 175px;
+	height: 100%;
+	margin: 0;
+}
+#group
+{
+	font-size: 12px;
+	text-align: left;
+	margin:0;
+}
