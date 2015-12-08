@@ -49,10 +49,13 @@
 						<div id = "KarnaughSetings">
 							Прозрачность полукарт
 							<input type="range" name="PlaneOpacity" min="0" max="1" step="0.01" value="0.7" onChange="ChangePLanes(document.KarnaughSets.PlaneOpacity.value);">
+							Прозрачность пустых ячеек
+							<input type="range" name="EmptyCellOpacity" min="0" max="1" step="0.01" value="1" onChange="ChangeCells(document.KarnaughSets.EmptyCellOpacity.value);">
 							<div id="group" ></div>
 						</div>
 						
 					</form>
+					<canvas id="2DimKC" height="460px" width="400px" margin="0" ></canvas>
 				</fieldset>
             </div>
             
@@ -106,13 +109,30 @@
 			var PlaneOpacity = 0.7;
 			var GROUPS = [];
 			var list_of_groups = [];
+			
+			var cell_groups = [];
+			var poses = [[[1,0],[0,0]],
+			[[1,1],[1,0],[0,1],[0,0]],
+			[[3,1],[2,1],[3,0],[2,0],[0,1],[1,1],[0,0],[1,0]],
+			[[3,3],[3,2],[2,3],[2,2],[3,0],[3,1],[2,0],[2,1],[0,3],[0,2],[1,3],[1,2],[0,0],[0,1],[1,0],[1,1]],
+			[[7,3],[6,3],[7,2],[6,2],[4,3],[5,3],[4,2],[5,2],[7,0],[6,0],[7,1],[6,1],[4,0],[5,0],[4,1],[5,1],
+				[0,3],[1,3],[0,2],[1,2],[3,3],[2,3],[3,2],[2,2],[0,0],[1,0],[0,1],[1,1],[3,0],[2,0],[3,1],[2,1]],
+			[[7,7],[7,6],[6,7],[6,6],[7,4],[7,5],[6,4],[6,5],[4,7],[4,6],[5,7],[5,6],[4,4],[4,5],[5,4],[5,5],
+				[7,0],[7,1],[6,0],[6,1],[7,3],[7,2],[6,3],[6,2],[4,0],[4,1],[5,0],[5,1],[4,3],[4,2],[5,3],[5,2],
+				[0,7],[0,6],[1,7],[1,6],[0,4],[0,5],[1,4],[1,5],[3,7],[3,6],[2,7],[2,6],[3,4],[3,5],[2,4],[2,5],
+				[0,0],[0,1],[1,0],[1,1],[0,3],[0,2],[1,3],[1,2],[3,0],[3,1],[2,0],[2,1],[3,3],[3,2],[2,3],[2,2]]];
 
 			var groupCubes = new THREE.Group();
 			var groupPlanes = new THREE.Group();
-
-			//var colors = [[2,0,0], [0,2,0], [0,0,2], [2,2,0], [0,2,2], [2,0,2], [2,1,0], [1,0,2], [1,2,0], [0,1,2]/*, [2,0,1], [1,0,0], [0,1,0], [0,0,1], [1,1,0], [0,1,1], */[1,0,1], [1,0.5,0], [0,1,0.5], [0.5,0,1], [0.5,0.5,0], [0,0.5,0.5], [0.5,0,0.5]];
 			
-			var colors = [[0.25,0,0.5],[1,0,0.5],[0,0,0.625],[0,0.5,0.75],[0,1,1],[0,1,0.25],[0,0.25,0],[0.5,0,0.25],[0.5,0.5,0],[0.25,0,0],[0,0.25,0.25],[1,0,0],[1,1,0],[1,0.5,0],[0.25,0.25,0.25],[0.25,0,0.25]]
+			var canvas = document.getElementById("2DimKC");
+			var ctx = canvas.getContext("2d");
+			
+			var colors_2D = ["#440088","#ff0088","#0000A0","#008844","#00ffff","#00ff44","#004400","#880044","#888800"]
+			
+			var colors = [[0.5,0,1],[2,0,1],[0,0,1.25],[0,1,0.5],[0,2,2],[0,2,0.5],[0,0.5,0],[1,0,0.5],[1,1,0],[0.5,0,0],[0,0.5,0.5],[2,0,0],[2,0.25,0.5],[2,1,0],[0.125,0.125,0.125],[2,0.5,1]];
+			
+			var group_colors = [];
 			
 			//var cur_year = 1970+Math.floor(new Date().getTime()/(1000*60*60*24*365));
 			//alert("Год:" + cur_year);
@@ -156,6 +176,9 @@
 				scene.add(groupCubes);
 				scene.add(groupPlanes);
 				
+				drawKarnaughcard(NumOfVars);
+				drawHalfCards(NumOfVars);
+				
 				//Создание рендерера
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor(0xffffff);
@@ -172,38 +195,66 @@
 				console.log(scene)
 			}
 			
-			//Визуализация групп ячеек
+			//Визуализация групп ячеек 
 			function Group(groups)//3 4 5 6
 			{
+				var size = 45;
+				if(NumOfVars > 4)
+					size = 35;
+					
 				console.log(list_of_groups)
+				ctx.globalAlpha = 0.5;
 				for(var group = 0; group < groups.length; group++)
 				{
+					
+					ctx.fillStyle = colors_2D[group];
 					for(var cell = 0; cell < groups[group].length; cell++)
 					{
-						groupCubes.children[groups[group][cell]].material.color.r = (groupCubes.children[groups[group][cell]].material.color.r + 2*colors[group%16][0])/2;
-						groupCubes.children[groups[group][cell]].material.color.g = (groupCubes.children[groups[group][cell]].material.color.g + 2*colors[group%16][1])/2;
-						groupCubes.children[groups[group][cell]].material.color.b = (groupCubes.children[groups[group][cell]].material.color.b + 2*colors[group%16][2])/2;						
+						cell_groups[groups[group][cell]].push(colors_2D[group]);
+						ctx.fillRect(41 +poses[NumOfVars-1][groups[group][cell]][0]*size,41 + poses[NumOfVars-1][groups[group][cell]][1]*size + (NumOfVars>4)*30,size-6,size-6);
+					
+						groupCubes.children[groups[group][cell]].material.color.r *= group_colors[groups[group][cell]];
+						groupCubes.children[groups[group][cell]].material.color.g *= group_colors[groups[group][cell]];
+						groupCubes.children[groups[group][cell]].material.color.b *= group_colors[groups[group][cell]];
+						
+						group_colors[groups[group][cell]]++;
+						
+						groupCubes.children[groups[group][cell]].material.color.r += colors[group%16][0];
+							
+						groupCubes.children[groups[group][cell]].material.color.r /= group_colors[groups[group][cell]];
+							
+						groupCubes.children[groups[group][cell]].material.color.g += colors[group%16][1];
+							
+						groupCubes.children[groups[group][cell]].material.color.g /= group_colors[groups[group][cell]];
+						
+						groupCubes.children[groups[group][cell]].material.color.b += colors[group%16][2];
+							
+						groupCubes.children[groups[group][cell]].material.color.b /= group_colors[groups[group][cell]];
+					
 					}
-					document.getElementById('group').innerHTML += '<p><input type="checkbox" name="group' + group + '" value="' + group + '" onchange="onGroupChange(document.KarnaughSets.group' + group + ')" checked>' + list_of_groups[group] + '</p>';
+					document.getElementById('group').innerHTML += '<p><input type="checkbox" name="group' + group + '" value="' + group + '" onchange="onGroupChange2D(document.KarnaughSets.group' + group + ');onGroupChange3D(document.KarnaughSets.group' + group + ')" checked>' + list_of_groups[group] + '</p>';
 				}
 			}
 			
-			function onGroupChange(group)
+			function onGroupChange3D(group)
 			{
 				for(var cell = 0; cell < GROUPS[group.value].length; cell++) 
 				{
-					if(group.checked)
-					{
-						groupCubes.children[GROUPS[group.value][cell]].material.color.r = (groupCubes.children[GROUPS[group.value][cell]].material.color.r + 2*colors[group.value%16][0])/2;
-						groupCubes.children[GROUPS[group.value][cell]].material.color.g = (groupCubes.children[GROUPS[group.value][cell]].material.color.g + 2*colors[group.value%16][1])/2;
-						groupCubes.children[GROUPS[group.value][cell]].material.color.b = (groupCubes.children[GROUPS[group.value][cell]].material.color.b + 2*colors[group.value%16][2])/2;
-					}
-					else
-					{
-						groupCubes.children[GROUPS[group.value][cell]].material.color.r = (groupCubes.children[GROUPS[group.value][cell]].material.color.r*2 - 2*colors[group.value%16][0]);
-						groupCubes.children[GROUPS[group.value][cell]].material.color.g = (groupCubes.children[GROUPS[group.value][cell]].material.color.g*2 - 2*colors[group.value%16][1]);
-						groupCubes.children[GROUPS[group.value][cell]].material.color.b = (groupCubes.children[GROUPS[group.value][cell]].material.color.b*2 - 2*colors[group.value%16][2]);
-					}
+
+					groupCubes.children[GROUPS[group.value][cell]].material.color.r *= group_colors[GROUPS[group.value][cell]];
+					groupCubes.children[GROUPS[group.value][cell]].material.color.g *= group_colors[GROUPS[group.value][cell]];
+					groupCubes.children[GROUPS[group.value][cell]].material.color.b *= group_colors[GROUPS[group.value][cell]];
+					
+					groupCubes.children[GROUPS[group.value][cell]].material.color.r += Math.pow(-1,!group.checked)*colors[group.value%16][0];
+					groupCubes.children[GROUPS[group.value][cell]].material.color.g += Math.pow(-1,!group.checked)*colors[group.value%16][1];
+					groupCubes.children[GROUPS[group.value][cell]].material.color.b += Math.pow(-1,!group.checked)*colors[group.value%16][2];
+					
+					group_colors[GROUPS[group.value][cell]] += Math.pow(-1,!group.checked);
+						
+					groupCubes.children[GROUPS[group.value][cell]].material.color.r /= group_colors[GROUPS[group.value][cell]];
+					groupCubes.children[GROUPS[group.value][cell]].material.color.g /= group_colors[GROUPS[group.value][cell]];
+					groupCubes.children[GROUPS[group.value][cell]].material.color.b /= group_colors[GROUPS[group.value][cell]];
+
 				}
 			}
 			
@@ -214,12 +265,29 @@
 					groupPlanes.children[child].material.opacity = NewOpacity;  
 			}
 			
+			//Изменение прозрачности пустых ячеек
+			function ChangeCells(NewOpacity)
+			{
+				var BinPow = Math.pow(2,NumOfVars);
+				var ExpressionValue = document.DataInput.MM.value;
+				for(var child = 0; child < BinPow; child++)
+					if(expression[child] != ExpressionValue)
+					{
+						groupCubes.children[child].material.opacity = NewOpacity;
+						groupCubes.children[child+BinPow].material.opacity = NewOpacity;
+					}
+			}
+			
 			//Переинициализация
 			function ReloadKC()
 			{
 				NumOfVars = document.DataInput.NumOfVars.value;
 				BinPow = Math.pow(2,NumOfVars);
 				PlaneOpacity = document.KarnaughSets.PlaneOpacity.value;
+				
+				ctx.clearRect(0,0,1000,1000);
+				ctx.globalAlpha = 1;
+				cell_colors = [];
 				
 				groupCubes = new THREE.Group();
 				groupPlanes = new THREE.Group();
@@ -235,9 +303,20 @@
 				NumOfVars = document.DataInput.NumOfVars.value;
 				BinPow = Math.pow(2,NumOfVars);
 				expression = document.DataInput.exp.value;
+				//expression = '0123456789abcddefghijklmnopqrstuvw000000000000000000000000000000000000000000000000000123456789ABCDEFGHIJKLMNOPQRSTUVW'
 				var pos = [0,0,0];
-				var TextMaterial = new THREE.MeshBasicMaterial({color: 0x000000, overdraw: 0.5});
+				
 				groupCubes.children = groupCubes.children.slice(0,BinPow); 
+				ctx.font = '30px sans-serif';
+				ctx.strokeStyle = "black";
+				ctx.globalAlpha = 1; 
+				
+				var size = 45;
+				if(NumOfVars > 4)
+				{
+					size = 35;
+					ctx.font = '20px sans-serif';
+				}
 				
 				for(var child = 0; child < BinPow; child++)
 				{
@@ -249,17 +328,29 @@
 					pos[1] = groupCubes.children[child].position.y - 6;
 					pos[2] = groupCubes.children[child].position.z - 1;					
 					
-					//Создание текста
+					//Создание трехмерного текста
 					var text3d = new THREE.TextGeometry(expression[child],{size: 15, height: 2, font: "gentilis", curveSegments: 1});
+					//
+					//!!!БАГ!!!
+					//
+						var TextMaterial = new THREE.MeshBasicMaterial({color: 0x000000, overdraw: 0.5, transparent:true});
+					//
+					//
+					//
 					text = new THREE.Mesh(text3d, TextMaterial);
 					text.position.set(pos[0], pos[1], pos[2]);
 					groupCubes.add(text);
+					
+					//Создание двухмерного текста
+					ctx.fillText(expression[child],0.25*size + poses[NumOfVars-1][child][0]*size + 40,poses[NumOfVars-1][child][1]*size + 40 + (NumOfVars>4)*30 + 0.7*size);
 				}
+				ctx.stroke();
+
 				scene.add(groupCubes);
 				document.getElementById('group').innerHTML = '';
 			}
 			
-			//Создание ячеек
+			//Создание ячеек(3D)
 			function Cube(MaxCount)
 			{
 				var pos = [0,0,0];
@@ -270,6 +361,7 @@
 						
 				for(var shift = 0; shift < Math.ceil(BinPow/8); shift++)
 				{
+					var count = (NumOfVars-1)%3;
 					if(shift == 0)
 						for(var coor = 0; coor < 3; coor++)
 						{
@@ -277,24 +369,37 @@
 							MaxCount[coor] -= (NumOfVars > 3+coor)*2*gap_plus_size;
 						}
 					
-					for(var j = 1; j <=8 ;j *=2)
-						if(shift%(2*j) == j)
-							for(var coor = 0; Math.pow(2,coor) <= j;coor ++)
-							{
-								StartCount[coor] = -StartCount[coor];
-								MaxCount[coor] = -MaxCount[coor];
-							}
+					
 						
+					if(shift%2 == 1)
+					{
+						StartCount[count] = -StartCount[count];
+						MaxCount[count] = -MaxCount[count];
+					}
+						
+					if(shift%4 == 2)
+					{
+						StartCount[count-1] = -StartCount[count-1];
+						MaxCount[count-1] = -MaxCount[count-1];
+						StartCount[count] = -StartCount[count];
+						MaxCount[count] = -MaxCount[count];
+					}
+					
+					if(shift%8 == 4)
+					{
+						StartCount[0] = -StartCount[0];
+						MaxCount[0] = -MaxCount[0];
+						StartCount[1] = -StartCount[1];
+						MaxCount[1] = -MaxCount[1];
+						StartCount[2] = -StartCount[2];
+						MaxCount[2] = -MaxCount[2];
+					}
 					
 					for(var coor = 0; coor < 3; coor++)
 							pos[coor] = StartCount[coor];
 
 					//for(var j = 0; j <= (NumOfVars-1)%3; j++)
-					pos[(NumOfVars-1)%3] -= Math.pow(-1,(shift%2))*gap_plus_size;
-					
-					//Костыли
-					pos[0] += Math.pow(-1,!(shift%2))*gap_plus_size*(NumOfVars == 5)*(shift == 1 || shift == 2);
-					pos[1] += Math.pow(-1,(shift%3))*gap_plus_size*(NumOfVars == 6)*(shift == 1 || shift == 3 || shift == 4 || shift == 6);
+					pos[count] -= Math.pow(-1,(shift%2))*gap_plus_size;
 					
 					for(var i = 0; i < end; i++)
 					{
@@ -307,8 +412,9 @@
 						}
 						
 						var geometry = new THREE.BoxGeometry(size, size, size);
-						var material = new THREE.MeshBasicMaterial({color: 0xcccccc/*map: THREE.ImageUtils.loadTexture('cell_texture.jpg')*/, opacity: 0.7,transparent: true, overdraw:0.5});
-						pos[count] += Math.pow(-1,!(shift%Math.pow(2,count+1)<Math.pow(2,count)))*gap_plus_size;// count == 0; shift: 0 1 2 3 4 5 6 7; count == 1; shift: 0 1 2 3 4 5 6 7; count == 2; shift 0 1 2 3 4 5 6 7
+						var material = new THREE.MeshBasicMaterial({color: 0xc0c0c0/*map: THREE.ImageUtils.loadTexture('cell_texture.jpg')*/, opacity: 0.7,transparent: true, overdraw:0.5});
+						pos[count] += Math.pow(-1,!(shift%Math.pow(2,(NumOfVars-3) + Math.pow(-1,NumOfVars > 4)*count)<Math.pow(2,(NumOfVars-4) + Math.pow(-1,NumOfVars > 4)*count)))*gap_plus_size;
+						group_colors.push(1);
 						cube = new THREE.Mesh(geometry, material);//							  	 							 	  + - + - + - + -				      + + - - + + - - 				     + + + + - - - -
 						cube.position.set(pos[0], pos[1], pos[2]);
 						groupCubes.add(cube);
@@ -316,7 +422,7 @@
 				}
 			}
 			
-			//Создание плоскостей
+			//Создание плоскостей(3D)
 			function Plane(MaxCount,MaxCountPx)
 			{
 				var text_pos = [];
@@ -326,7 +432,7 @@
 				//Вычисление расположения и размеров полукарт
 				for(i = 0; i < NumOfVars; i++)
 				{
-					var not = 'n';
+					var not = '¬';
 					var count = 2;
 					var plane_size = [size + (MaxCountPx[i%3] - 1)*gap_plus_size,size + gap_plus_size*Math.floor(NumOfVars/(4 + i))];
 					if(i < 3)
@@ -394,7 +500,190 @@
 					}
 				}
 			}
- 
+			
+			function onGroupChange2D(group)
+			{
+				var size = 45;
+				if(NumOfVars > 4)
+				{
+					size = 35;
+					ctx.font = '20px sans-serif';
+				}
+				
+				for(var cell = 0; cell < GROUPS[group.value].length; cell++) 
+				{
+					var RectX = poses[NumOfVars-1][GROUPS[group.value][cell]][0]*size;
+					var RectY = poses[NumOfVars-1][GROUPS[group.value][cell]][1]*size;
+					
+					if(group.checked)
+					{
+						ctx.globalAlpha = 0.5;
+						ctx.fillStyle = colors_2D[group.value];
+						cell_groups[GROUPS[group.value][cell]].push(colors_2D[group.value]);
+						ctx.fillRect(41 + RectX, 41 + RectY + (NumOfVars>4)*30, size-6, size-6);
+						ctx.fillText(expression[GROUPS[group.value][cell]],0.25*size + RectX + 40,RectY + 40 + (NumOfVars>4)*30 + 0.7*size);
+
+					}
+					else
+					{							
+						ctx.clearRect(41 + RectX, 41 + RectY + (NumOfVars>4)*30,size-6,size-6);
+						
+						cell_groups[GROUPS[group.value][cell]] = RemoveByName(cell_groups[GROUPS[group.value][cell]], colors_2D[group.value])
+						
+						ctx.globalAlpha = 1;
+						ctx.fillStyle = "black";
+						
+						
+						ctx.fillText(expression[GROUPS[group.value][cell]],0.25*size + RectX + 40,RectY + 40 + (NumOfVars>4)*30 + 0.7*size);
+							
+						ctx.globalAlpha = 0.5;
+						for(var color = 0; color < cell_groups[GROUPS[group.value][cell]].length; color++)
+						{
+							ctx.fillStyle = cell_groups[GROUPS[group.value][cell]][color];
+							ctx.fillRect(41 + RectX, 41 + RectY + (NumOfVars>4)*30, size-6, size-6);
+						}
+					}
+				}
+			}
+				
+			function RemoveByName(array,value)
+			{
+				var piv = array.indexOf(value);
+				return array.slice(0, piv).concat(array.slice(piv+1))
+			}
+				
+			function drawHalfCards(NumOfVars)
+			{
+				var height = Math.pow(2, Math.floor(NumOfVars/2));
+				var width = Math.pow(2, Math.ceil(NumOfVars/2));
+				var size = 45;
+				if(NumOfVars > 4)
+					size = 35;
+				
+				ctx.font = '20px sans-serif';
+				ctx.fillStyle = "black";
+				ctx.beginPath();
+				switch(NumOfVars)
+				{
+					case "6":
+						//x5
+						ctx.moveTo(80+width*size,70+height*size*0/8);
+						ctx.lineTo(80+width*size,70+height*size*1/8 - 5);
+						ctx.fillText('X' + '\u0305' + 5,80+width*size + 5,70+height*size*1/16 + 5);
+							
+						ctx.moveTo(80+width*size,70+height*size*1/8);
+						ctx.lineTo(80+width*size,70+height*size*3/8 - 5);
+						ctx.fillText('X' + 5,80+width*size + 5,70+height*size*4/16 + 5);
+							
+						ctx.moveTo(80+width*size,70+height*size*3/8);
+						ctx.lineTo(80+width*size,70+height*size*5/8 - 5);
+						ctx.fillText('X' + '\u0305' + 5,80+width*size + 5,70+height*size*8/16 + 5);
+							
+						ctx.moveTo(80+width*size,70+height*size*5/8);
+						ctx.lineTo(80+width*size,70+height*size*7/8 - 5);
+						ctx.fillText('X' + 5,980+width*size + 5,70+height*size*12/16 + 5);
+						
+						ctx.moveTo(80+width*size,70+height*size*7/8);
+						ctx.lineTo(80+width*size,70+height*size*8/8 - 5);
+						ctx.fillText('X' + '\u0305' + 5,80+width*size + 5,70+height*size*15/16 + 5);
+							
+					case "5":
+						//x4
+						ctx.moveTo(40+width*size*0/8,	35);
+						ctx.lineTo(40+width*size*1/8 - 5,35);
+						ctx.fillText('X' + '\u0305' + 4,40+width*size*1/16 - 10,30);
+						
+						ctx.moveTo(40+width*size*1/8,	35);
+						ctx.lineTo(40+width*size*3/8 - 5,35);
+						ctx.fillText('X' + 4,40+width*size*4/16 - 10,30);
+							
+						ctx.moveTo(40+width*size*3/8,	35);
+						ctx.lineTo(40+width*size*5/8 - 5,35);
+						ctx.fillText('X' + '\u0305' + 4,40+width*size*8/16 - 10,30);
+							
+						ctx.moveTo(40+width*size*5/8,	35);
+						ctx.lineTo(40+width*size*7/8 - 5,35);
+						ctx.fillText('X' + 4,40+width*size*12/16 - 10,30);
+						
+						ctx.moveTo(40+width*size*7/8,	35);
+						ctx.lineTo(40+width*size*8/8 - 5,35);
+						ctx.fillText('X' + '\u0305' + 4,40+width*size*15/16 - 10,30);
+					
+					case "4":
+						//x3
+						ctx.moveTo(35,40+height*size*0/4 + (NumOfVars>4)*30);
+						ctx.lineTo(35,40+height*size*1/4 - 5 + (NumOfVars>4)*30);
+						ctx.fillText('X' + '\u0305' + 3,5,40+height*size*1/8 + (NumOfVars>4)*30);
+							
+						ctx.moveTo(35,40+height*size*1/4 + (NumOfVars>4)*30);
+						ctx.lineTo(35,40+height*size*3/4 - 5 + (NumOfVars>4)*30);
+						ctx.fillText('X' + 3,5,40+height*size*4/8 + (NumOfVars>4)*30);
+						
+						ctx.moveTo(35,40+height*size*3/4 + (NumOfVars>4)*30);
+						ctx.lineTo(35,40+height*size*4/4 - 5 + (NumOfVars>4)*30);
+						ctx.fillText('X' + '\u0305' + 3,5,40+height*size*7/8 + (NumOfVars>4)*30);
+						
+					case "3":
+						//x2
+						ctx.moveTo(40+width*size*0/4,	40+height*size + (NumOfVars>4)*30);
+						ctx.lineTo(40+width*size*1/4 - 5,40+height*size + (NumOfVars>4)*30);
+						ctx.fillText('X' + '\u0305' + 2,40+width*size*1/8 - 10,40+height*size + 25 + (NumOfVars>4)*30);
+							
+						ctx.moveTo(40+width*size*1/4,	40+height*size + (NumOfVars>4)*30);
+						ctx.lineTo(40+width*size*3/4 - 5,40+height*size + (NumOfVars>4)*30);
+						ctx.fillText('X' + 2,40+width*size*4/8 - 10,40+height*size + 25 + (NumOfVars>4)*30);
+						
+						ctx.moveTo(40+width*size*3/4,	40+height*size + (NumOfVars>4)*30);
+						ctx.lineTo(40+width*size*4/4 - 5,40+height*size + (NumOfVars>4)*30);
+						ctx.fillText('X' + '\u0305' + 2,40+width*size*7/8 - 10,40+height*size + 25 + (NumOfVars>4)*30);
+							
+					case "2":
+						//x1
+						ctx.moveTo(40+width*size,40+height*size*0/2 + (NumOfVars>4)*30);
+						ctx.lineTo(40+width*size,40+height*size*1/2 - 5 + (NumOfVars>4)*30);
+						ctx.fillText('X' + 1,50+width*size,40+height*size*1/4 + (NumOfVars>4)*30);
+							
+						ctx.moveTo(40+width*size,40+height*size*1/2 + (NumOfVars>4)*30);
+						ctx.lineTo(40+width*size,40+height*size*2/2 - 5 + (NumOfVars>4)*30);
+						ctx.fillText('X' + '\u0305' + 1,50+width*size,40+height*size*3/4 + (NumOfVars>4)*30);
+						
+					case "1":
+						//x0
+						ctx.moveTo(40+width*size*0/2,35 + (NumOfVars>4)*30);
+						ctx.lineTo(40+width*size*1/2 -5,35 + (NumOfVars>4)*30);
+						ctx.fillText('X' + 0,40+width*size*1/4 - 10,30 + (NumOfVars>4)*30);
+						
+						ctx.moveTo(40+width*size*1/2 + (NumOfVars>5)*5,35 + (NumOfVars>4)*30);
+						ctx.lineTo(40+width*size*2/2 - 5 + (NumOfVars>5)*5,35 + (NumOfVars>4)*30);
+						ctx.fillText('X' + '\u0305' + 0,40+width*size*3/4  + (NumOfVars>5)*5 - 10,30 + (NumOfVars>4)*30);
+				}
+				
+				ctx.stroke();
+				ctx.closePath();
+			}
+
+			function drawKarnaughcard(NumOfVars)
+			{
+				var height = Math.pow(2, Math.floor(NumOfVars/2));
+				var width = Math.pow(2, Math.ceil(NumOfVars/2));
+				var size = 45;
+				if(NumOfVars > 4)
+					size = 35;
+					
+				function Cell(pos)
+				{
+					ctx.strokeRect(pos[0]*size + 40.5,pos[1]*size + 40.5 + (NumOfVars>4)*30, size-5, size-5);
+				}
+				
+				ctx.font = '30px sans-serif';
+
+				for(var i =0; i< Math.pow(2,NumOfVars);i++)
+				{
+					Cell(poses[NumOfVars-1][i]);
+					cell_groups.push([]);
+				}
+			}
+			
 			function onWindowResize()
 			{
 				windowHalfX = 200;

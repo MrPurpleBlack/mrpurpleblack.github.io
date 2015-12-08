@@ -1,5 +1,3 @@
-var flag_0;
-var flag_1;
 var out_br;
 
 function calculate()
@@ -7,13 +5,7 @@ function calculate()
     var NumOfVars = document.DataInput.NumOfVars.value;//Количество переменных
     var ExpressionValue = document.DataInput.MM.value;//Значение мднф или мкнф
 	var exp = document.DataInput.exp.value;//Выражение таблицы истинности
-	
-   
-	
     var groups = new Array();
-	//Флаги исключений
-    flag_0 = true;
-    flag_1 = true;
 	
     for(var index = 0;index < Math.pow(2,NumOfVars); index++)//Составление списка ячеек
     {
@@ -21,19 +13,15 @@ function calculate()
 		switch(exp[index])
 		{
 			case '0':
-				flag_1 = false;
-				continue;
 			case '1':
-				flag_0 = false;
-				continue
+				continue;
 			default:
 				alert("Таблица истинности заполнена неверными значениями!");//Ошибка - недопустимое значение
 				return '';
 		}
     }
 	//Вывод исключительных выражений
-    if(flag_0) return /*'(X0 & \u0305X0)';*/[];
-    //if(flag_1) return /*'(X0 V \u0305X0)';*/groups;
+    if(groups.length == 0) return groups;
            
     for(var i = 1; i < Math.pow(2,NumOfVars); i <<= 1)//Объединение ячеек в группы
         groups = MakeGroups(groups,NumOfVars,i);
@@ -41,7 +29,7 @@ function calculate()
     groups = groups.sort(function(a,b){return b.length - a.length})
 	
 	//Исключение повторяющихся и ненужных групп
-    for(var iter = 0; iter < NumOfVars; iter++)
+    for(var iter = 0; iter < NumOfVars + 2; iter++)
     {
 		groups = CheckGroups(groups);
         var buf = groups.shift();
@@ -89,7 +77,7 @@ function ValNumChange(NumOfVars)
     Data.exp.style.height = x + 'px';
     Data.TruthTable.style.height = x + 'px';
 	
-    if(NumOfVars < 5) x=370;
+    if(NumOfVars < 6) x=590;
 	document.getElementById("input").style.height = x + 70 + 'px';
     document.getElementById("karnaugh").style.height = x + 70 + 'px';
 }
@@ -124,7 +112,7 @@ return false;
 function MakeGroups(groups,NumOfVars,leng)
 {
     var NewGroups = new Array();
-    for(var group=0;group<groups.length;group++)
+    for(var group = 0;group < groups.length; group++)
     {
         var PotentialGroups = new Array();
         if(groups[group].length==leng)
@@ -158,9 +146,9 @@ function CheckGroups(groups)
 {
     var DescCells = new Array();
     var NewGroups = new Array();
-    for(var group=0;group<groups.length;group++)
+    for(var group = 0;group < groups.length; group++)
     {
-        for(var cell=0;cell<groups[group].length;cell++)
+        for(var cell = 0; cell<groups[group].length; cell++)
         {
             if(!DescCells.ValueInArray(groups[group][cell]))
             {
@@ -175,8 +163,7 @@ function CheckGroups(groups)
         
 function MakeLogExpression(groups)
 {
-	if(flag_0) return 'X\u2080 V \u0305X\u2080';
-	if(flag_1) return 'X\u2080 & \u0305X\u2080';
+	
 	var NumOfVars = document.DataInput.NumOfVars.value;
 	var InvSigns = ['','\u0305'];//Функции не
     var BracketOps = [' & ',' V '];//Функции И, ИЛИ
@@ -187,8 +174,9 @@ function MakeLogExpression(groups)
         InvSigns.reverse();
         BracketOps.reverse();
     }
-	
 	out_br = BracketOps[1];
+	
+	if((groups.length == 0) || (groups[0].length == Math.pow(2,NumOfVars))) return ['X\u2080 ' + BracketOps[+(groups.length == 0)] + ' \u0305X\u2080'];
 	
     var expression = [];
     var UnicodeIndex = ['\u2080','\u2081','\u2082','\u2083','\u2084','\u2085'];
@@ -217,7 +205,7 @@ function MakeLogExpression(groups)
 		
         expression.push(group);
         }
-	return expression.sort()
+	return expression
     //return expression.join(BracketOps[1]);
 }
 
@@ -253,7 +241,7 @@ function MakeLogExpression(groups)
          nX3| |___|___|___|___|___|___|___|___| |   |
             | | 32| 34| 42| 40| 8 | 10| 2 | 0 | |   |nX5
             | |___|___|___|___|___|___|___|___| |   |
-               ___nX2__ ______X2_______ __nX2___
+               ___nX2__ ______X2______ __nX2___
         
         nX0 : x%64 < 32 
         nX1 : x%32 < 16 
