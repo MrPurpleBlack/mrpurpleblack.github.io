@@ -64,13 +64,13 @@ body,textarea,input,select
 #input
 {
     width: 374px;
-    height: 430px;
+    height: 660px;
     float: left;
     margin: 5px;
 }
 #karnaugh
 {
-    height: 430px;
+    height: 660px;
     width: 606px;
     float: left;
     margin: 5px;
@@ -100,6 +100,7 @@ body,textarea,input,select
 	position: relative;
 	margin: 0;
 }
+
 #KarnaughSetings
 {
 	text-align: center;
