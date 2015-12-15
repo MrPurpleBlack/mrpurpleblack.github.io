@@ -17,7 +17,7 @@
 						</div>
 							<textarea type="text" name="TruthTable" id="TruthTable" readonly="true">0 0 0 0 0 0 0 1 0 0 1 0 0 0 1 1 0 1 0 0 0 1 0 1 0 1 1 0 0 1 1 1 1 0 0 0 1 0 0 1 1 0 1 0 1 0 1 1 1 1 0 0 1 1 0 1 1 1 1 0 1 1 1 1</textarea>
                         </div>
-						<textarea type="text" name="exp" id="exp" maxLength="16" onKeyUp="if(/[^0-1 .]/i.test(this.value)){this.value=this.value.substr(0,this.value.length-1);}"></textarea>
+						<textarea type="text" name="exp" id="exp" maxLength="16" autofocus onKeyUp="if(/[^0-1 .]/i.test(this.value)){this.value=this.value.substr(0,this.value.length-1);}"></textarea>
                         <div class="data">
                             <b>Количество переменных</b><br>
                             <select name="NumOfVars" onchange="ValNumChange(document.DataInput.NumOfVars.value); ReloadKC();">
@@ -35,7 +35,13 @@
                             <input name="MM" type="radio" value="0">
                             МКНФ 
                             </p>
-                            <input type="button" value="Вычислить" onclick="ReloadValues(); GROUPS = calculate(); list_of_groups = MakeLogExpression(GROUPS); Group(GROUPS); document.OutputData.ret.value = list_of_groups.join(out_br);"> 
+                            <input type="button" value="Вычислить" onclick="
+							ReloadValues();
+							GROUPS = calculate(); 
+							list_of_groups = MakeLogExpression(GROUPS); 
+							Group(GROUPS); 
+							document.OutputData.ret.value = list_of_groups.join(out_br);
+							"> 
                         </div>
                     </form>    
                 </fieldset>        
@@ -50,7 +56,7 @@
 							Прозрачность полукарт
 							<input type="range" name="PlaneOpacity" min="0" max="1" step="0.01" value="0.7" onChange="ChangePLanes(document.KarnaughSets.PlaneOpacity.value);">
 							Прозрачность пустых ячеек
-							<input type="range" name="EmptyCellOpacity" min="0" max="1" step="0.01" value="1" onChange="ChangeCells(document.KarnaughSets.EmptyCellOpacity.value);">
+							<input type="range" name="EmptyCellOpacity" min="0" max="0.7" step="0.01" value="0.7" onChange="ChangeCells(document.KarnaughSets.EmptyCellOpacity.value);">
 							<div id="group" ></div>
 						</div>
 						
@@ -128,9 +134,9 @@
 			var canvas = document.getElementById("2DimKC");
 			var ctx = canvas.getContext("2d");
 			
-			var colors_2D = ["#440088","#ff0088","#0000A0","#008844","#00ffff","#00ff44","#004400","#880044","#888800"]
+			var colors_2D = ["#ff0000","#ff0088","#0000A0","#008844","#00ffff","#00ff44","#004400","#880044","#888800"]
 			
-			var colors = [[0.5,0,1],[2,0,1],[0,0,1.25],[0,1,0.5],[0,2,2],[0,2,0.5],[0,0.5,0],[1,0,0.5],[1,1,0],[0.5,0,0],[0,0.5,0.5],[2,0,0],[2,0.25,0.5],[2,1,0],[0.125,0.125,0.125],[2,0.5,1]];
+			var colors = [[2,0,0],[0.5,0,1],[2,0,1],[0,0,1.25],[0,1,0.5],[0,2,2],[0,2,0.5],[0,0.5,0],[1,0,0.5],[1,1,0],[0.5,0,0],[0,0.5,0.5],[2,0,0],[2,0.25,0.5],[2,1,0],[0.125,0.125,0.125],[2,0.5,1]];
 			
 			var group_colors = [];
 			
@@ -171,11 +177,14 @@
 				
 				//Создание ячеек
 				Cube(MaxCount)
+				
+				
 								
 				//Вывод созданных элементов на сцену
 				scene.add(groupCubes);
 				scene.add(groupPlanes);
 				
+				ctx.clearRect(0,0,400,400);
 				drawKarnaughcard(NumOfVars);
 				drawHalfCards(NumOfVars);
 				
@@ -183,6 +192,8 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor(0xffffff);
 				renderer.setSize(400, 400);
+				renderer.clearDepth();
+				renderer.render(scene,camera);
 				container.appendChild(renderer.domElement);
 			
 				//События мыши для вращения КК
@@ -202,7 +213,7 @@
 				if(NumOfVars > 4)
 					size = 35;
 					
-				console.log(list_of_groups)
+				console.log(list_of_groups);
 				ctx.globalAlpha = 0.5;
 				for(var group = 0; group < groups.length; group++)
 				{
@@ -274,7 +285,8 @@
 					if(expression[child] != ExpressionValue)
 					{
 						groupCubes.children[child].material.opacity = NewOpacity;
-						groupCubes.children[child+BinPow].material.opacity = NewOpacity;
+						groupCubes.children[child+BinPow].material.opacity = 1.43*NewOpacity;
+						groupCubes.children[child+BinPow].renderOrder = 2;
 					}
 			}
 			
@@ -285,7 +297,8 @@
 				BinPow = Math.pow(2,NumOfVars);
 				PlaneOpacity = document.KarnaughSets.PlaneOpacity.value;
 				
-				ctx.clearRect(0,0,1000,1000);
+				document.KarnaughSets.EmptyCellOpacity.value = 0.7;
+				
 				ctx.globalAlpha = 1;
 				cell_colors = [];
 				
@@ -305,10 +318,14 @@
 				expression = document.DataInput.exp.value;
 				//expression = '0123456789abcddefghijklmnopqrstuvw000000000000000000000000000000000000000000000000000123456789ABCDEFGHIJKLMNOPQRSTUVW'
 				var pos = [0,0,0];
+				groupCubes.children = groupCubes.children.slice(0,BinPow);
 				
-				groupCubes.children = groupCubes.children.slice(0,BinPow); 
+				for(var child = 0; child < BinPow; child++)
+					groupCubes.children[child].material.opacity = 0.7;
+
+				groupValues =  new THREE.Group()
 				ctx.font = '30px sans-serif';
-				ctx.strokeStyle = "black";
+				ctx.fillStyle = "black";
 				ctx.globalAlpha = 1; 
 				
 				var size = 45;
@@ -317,34 +334,38 @@
 					size = 35;
 					ctx.font = '20px sans-serif';
 				}
-				
+
 				for(var child = 0; child < BinPow; child++)
 				{
+					ctx.clearRect(41 + poses[NumOfVars-1][child][0]*size, 41 +poses[NumOfVars-1][child][1]*size + (NumOfVars>4)*30,size-6,size-6);
+					
+					cell_groups[child] =[];
+					
 					groupCubes.children[child].material.color.r = 0.75;
 					groupCubes.children[child].material.color.g = 0.75;
 					groupCubes.children[child].material.color.b = 0.75;
 					
 					pos[0] = groupCubes.children[child].position.x - 5;
 					pos[1] = groupCubes.children[child].position.y - 6;
-					pos[2] = groupCubes.children[child].position.z - 1;					
+					pos[2] = groupCubes.children[child].position.z - 1;		
 					
 					//Создание трехмерного текста
-					var text3d = new THREE.TextGeometry(expression[child],{size: 15, height: 2, font: "gentilis", curveSegments: 1});
+					text3d = new THREE.TextGeometry(expression[child],{size: 15, height: 2, font: "gentilis", curveSegments: 1});
 					//
 					//!!!БАГ!!!
 					//
-						var TextMaterial = new THREE.MeshBasicMaterial({color: 0x000000, overdraw: 0.5, transparent:true});
+						TextMaterial = new THREE.MeshBasicMaterial({color: 0x000000, overdraw: 0.5, opacity: 1, transparent: true});
 					//
 					//
 					//
 					text = new THREE.Mesh(text3d, TextMaterial);
 					text.position.set(pos[0], pos[1], pos[2]);
+					text.renderOrder = 1;
 					groupCubes.add(text);
 					
 					//Создание двухмерного текста
-					ctx.fillText(expression[child],0.25*size + poses[NumOfVars-1][child][0]*size + 40,poses[NumOfVars-1][child][1]*size + 40 + (NumOfVars>4)*30 + 0.7*size);
+					ctx.fillText(expression[child],0.27*size + poses[NumOfVars-1][child][0]*size + 40,poses[NumOfVars-1][child][1]*size + 40 + (NumOfVars>4)*30 + 0.7*size);
 				}
-				ctx.stroke();
 
 				scene.add(groupCubes);
 				document.getElementById('group').innerHTML = '';
@@ -412,10 +433,11 @@
 						}
 						
 						var geometry = new THREE.BoxGeometry(size, size, size);
-						var material = new THREE.MeshBasicMaterial({color: 0xc0c0c0/*map: THREE.ImageUtils.loadTexture('cell_texture.jpg')*/, opacity: 0.7,transparent: true, overdraw:0.5});
+						var material = new THREE.MeshBasicMaterial({color: 0xc0c0c0/*map: THREE.ImageUtils.loadTexture('cell_texture.jpg')*/, opacity: 0.7,transparent: true});
 						pos[count] += Math.pow(-1,!(shift%Math.pow(2,(NumOfVars-3) + Math.pow(-1,NumOfVars > 4)*count)<Math.pow(2,(NumOfVars-4) + Math.pow(-1,NumOfVars > 4)*count)))*gap_plus_size;
 						group_colors.push(1);
 						cube = new THREE.Mesh(geometry, material);//							  	 							 	  + - + - + - + -				      + + - - + + - - 				     + + + + - - - -
+						cube.renderOrder = 2;
 						cube.position.set(pos[0], pos[1], pos[2]);
 						groupCubes.add(cube);
 					}
@@ -474,6 +496,7 @@
 						angle_set[(5 - i)%3] = -Math.PI/2;
 						plane = new THREE.Mesh(geometry, material);
 						plane.material.side = THREE.DoubleSide;
+						plane.renderOrder = 2;
 						plane.rotation.set(angle_set[0], angle_set[1], angle_set[2])
 						plane.position.set(plane_pos[0], plane_pos[1], plane_pos[2]);
 						groupPlanes.add(plane);
@@ -493,6 +516,7 @@
 						
 						var text3d = new THREE.TextGeometry(not + 'X' + i,{size: 5, height: 0.5, font: "gentilis", curveSegments: 1});
 						text = new THREE.Mesh(text3d, TextMaterial);
+						text.renderOrder = 2;
 						text.rotation.set(angle_set[0], angle_set[1], 0);
 						text.position.set(text_pos[0], text_pos[1], text_pos[2]);
 						groupPlanes.add(text);
@@ -521,7 +545,7 @@
 						ctx.fillStyle = colors_2D[group.value];
 						cell_groups[GROUPS[group.value][cell]].push(colors_2D[group.value]);
 						ctx.fillRect(41 + RectX, 41 + RectY + (NumOfVars>4)*30, size-6, size-6);
-						ctx.fillText(expression[GROUPS[group.value][cell]],0.25*size + RectX + 40,RectY + 40 + (NumOfVars>4)*30 + 0.7*size);
+						ctx.fillText(expression[GROUPS[group.value][cell]],0.27*size + RectX + 40,RectY + 40 + (NumOfVars>4)*30 + 0.7*size);
 
 					}
 					else
@@ -533,8 +557,7 @@
 						ctx.globalAlpha = 1;
 						ctx.fillStyle = "black";
 						
-						
-						ctx.fillText(expression[GROUPS[group.value][cell]],0.25*size + RectX + 40,RectY + 40 + (NumOfVars>4)*30 + 0.7*size);
+						ctx.fillText(expression[GROUPS[group.value][cell]],0.27*size + RectX + 40,RectY + 40 + (NumOfVars>4)*30 + 0.7*size);
 							
 						ctx.globalAlpha = 0.5;
 						for(var color = 0; color < cell_groups[GROUPS[group.value][cell]].length; color++)
@@ -767,6 +790,29 @@
 				groupPlanes.rotation.x += (targetRotationY - groupPlanes.rotation.x) * 0.05;
 				renderer.render(scene, camera);
 			}
+			
+			/*
+
+			…or create a new repository on the command line
+
+
+			echo # Karnaugh >> README.md
+			git init
+			git add README.md
+			git commit -m "first commit"
+			git remote add origin https://github.com/MrPurpleBlack/Karnaugh.git
+			git push -u origin master
+			
+			…or push an existing repository from the command line
+
+			git remote add origin https://github.com/MrPurpleBlack/Karnaugh.git
+			git push -u origin master
+			…or import code from another repository
+
+			You can initialize this repository with code from a Subversion, Mercurial, or TFS project.
+
+			*/
+			
 		</script>
     </body>
 </html>

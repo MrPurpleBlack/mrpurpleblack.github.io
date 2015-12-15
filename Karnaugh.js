@@ -195,7 +195,7 @@ function MakeLogExpression(groups)
             }
             group.push(GroupCell);
         }
-        for(var cell = 1; cell < group.length; cell++)
+        for(var cell = 1; cell < group.length; cell++)//[[x0,x1,nx2],[x0,nx1,nx2]]
             for(var val = 0; val < group[cell].length; val++)
                 if(group[0][val] != group[cell][val])
                     group[0][val] = '';
@@ -208,6 +208,8 @@ function MakeLogExpression(groups)
 	return expression
     //return expression.join(BracketOps[1]);
 }
+
+
 
         /*  
 		Старый алгоритм!!!
