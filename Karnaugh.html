@@ -286,7 +286,10 @@
 					{
 						groupCubes.children[child].material.opacity = NewOpacity;
 						groupCubes.children[child+BinPow].material.opacity = 1.43*NewOpacity;
-						groupCubes.children[child+BinPow].renderOrder = 2;
+						if(NewOpacity == 0)
+							groupCubes.children[child+BinPow].renderOrder = 2;
+						else
+							groupCubes.children[child+BinPow].renderOrder = 1;
 					}
 			}
 			
