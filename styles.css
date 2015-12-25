@@ -17,6 +17,21 @@ body,textarea,input,select
     position: relative;
     margin: 0px;
 }
+h5
+{
+	font-family: Tahoma, Geneva, sans-serif;
+    font-size: 12;
+	font-weight:normal;
+	margin: 0;
+}
+span
+{
+	font-family: Tahoma, Geneva, sans-serif;
+    font-size: 12;
+	font-weight:normal;
+	margin: 0;
+}
+
 #TT
 {
     float: left;

@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Построение логических выражений</title>
+        <title>Визуализация карт Карно</title>
         <meta content="text/html; charset=utf-16" />
         <link rel="stylesheet" type="text/css" href="styles.css"/>
         <header align="center"></header>
@@ -41,7 +41,17 @@
 							list_of_groups = MakeLogExpression(GROUPS); 
 							Group(GROUPS); 
 							document.OutputData.ret.value = list_of_groups.join(out_br);
-							"> 
+							">
+							
+							<details>
+								<summary><span>Внимание! BETA</span></summary>
+								<h5>При обнаружении ошибок вывода или </h5>
+								<h5>артефактов отображения, пожалуйста,</h5>
+								<h5>отправьте краткий репорт по адресу</h5>
+								<h5>mrpurpleblack@gmail.com</h5>
+							</details>
+							
+							
                         </div>
                     </form>    
                 </fieldset>        
@@ -75,7 +85,7 @@
                 </fieldset>
             </div>
         </div>
-		<div id="author"><h4>Составитель логических выражений © 2015</h4></div> 
+		<div id="author"><h4>2015, Визуализация карт Карно</h4></div> 
 		
         <script src="Karnaugh.js"></script>
 		<script src="three/three.min.js"></script>
@@ -143,6 +153,19 @@
 			//var cur_year = 1970+Math.floor(new Date().getTime()/(1000*60*60*24*365));
 			//alert("Год:" + cur_year);
 			
+			
+			/*
+			<details>
+				<summary><span>Неочевидные соседние ячейки</span></summary>
+				<span>Для 5 переменных</span>
+				<span>00110000000000000011000000000000</span>
+				<span>00010001000000000001000100000000</span>
+				<span>Для 6 переменных</span>
+				<span>0001000000000000000100000000000000010000000000000001000000000000</span>
+				<span>0001000100010001000100010001000100010001000100010001000100010001</span>
+			</details>
+			
+			*/
 			init();
 			animate();
 			
@@ -158,28 +181,13 @@
 				
 				//Создание сцены
 				scene = new THREE.Scene();
-							
-				//Вычисление разположения и размеров объектов сцены
-				var MaxCount = [1,1,1];
-				var MaxCountPx = [1,1,1];
-				
-				for(var i = 0; i < NumOfVars; i++)
-					MaxCountPx[i%3] *= 2;
-				
-				for(i = 2; i + 1; i--)
-					MaxCount[i] = (MaxCountPx[i] - 1)*(gap_plus_size)/2;
-									
-				var buf = MaxCountPx.shift();
-				MaxCountPx.push(buf);
 				
 				//Создание полукарт
-				Plane(MaxCount,MaxCountPx);
+				Plane();
 				
 				//Создание ячеек
-				Cube(MaxCount)
-				
-				
-								
+				Cube();
+						
 				//Вывод созданных элементов на сцену
 				scene.add(groupCubes);
 				scene.add(groupPlanes);
@@ -214,17 +222,19 @@
 					size = 35;
 					
 				document.getElementById('group').innerHTML += '<p><input type="checkbox" name="groupAll" value="All" onchange="onAllGroupsChange()" checked>Все группы</p>';
-				console.log(list_of_groups);
+				//console.log(list_of_groups);
 				ctx.globalAlpha = 0.5;
 				for(var group = 0; group < groups.length; group++)
 				{
-					
+					ctx.globalAlpha = 0.5;
 					ctx.fillStyle = colors_2D[group];
+					console.log(groups[group]);
 					for(var cell = 0; cell < groups[group].length; cell++)
 					{
 						cell_groups[groups[group][cell]].push(colors_2D[group]);
 						ctx.fillRect(41 +poses[NumOfVars-1][groups[group][cell]][0]*size,41 + poses[NumOfVars-1][groups[group][cell]][1]*size + (NumOfVars>4)*30,size-6,size-6);
-					
+						
+						
 						groupCubes.children[groups[group][cell]].material.color.r *= group_colors[groups[group][cell]];
 						groupCubes.children[groups[group][cell]].material.color.g *= group_colors[groups[group][cell]];
 						groupCubes.children[groups[group][cell]].material.color.b *= group_colors[groups[group][cell]];
@@ -244,6 +254,13 @@
 						groupCubes.children[groups[group][cell]].material.color.b /= group_colors[groups[group][cell]];
 					
 					}
+					ctx.globalAlpha = 1;
+					ctx.fillStyle = "black";
+					
+					//console.log(poses[NumOfVars-1][groups[group][cell]],groups[group], cell)
+						
+					//ctx.fillText(expression[groups[group][cell-1]], 0.27*size + 41 +poses[NumOfVars-1][groups[group][cell-1]][0]*size, 41 + poses[NumOfVars-1][groups[group][cell-1]][1]*size + (NumOfVars>4)*30 + 0.7*size);
+						
 					document.getElementById('group').innerHTML += '<p><input type="checkbox" name="group' + group + '" value="' + group + '" onchange="onGroupChange2D(document.KarnaughSets.group' + group + '.value,document.KarnaughSets.group' + group + '.checked);onGroupChange3D(document.KarnaughSets.group' + group + '.value,document.KarnaughSets.group' + group + '.checked)" checked>' + list_of_groups[group] + '</p>';
 				}
 				console.log(document.KarnaughSets);
@@ -305,11 +322,11 @@
 					if(expression[child] != ExpressionValue)
 					{
 						groupCubes.children[child].material.opacity = NewOpacity;
-						groupCubes.children[child+BinPow].material.opacity = 1.43*NewOpacity;
+						groupCubes.children[child + BinPow].material.opacity = 1.43*NewOpacity;
 						if(NewOpacity < 0.05)
-							groupCubes.children[child+BinPow].renderOrder = 2;
+							groupCubes.children[child + BinPow].renderOrder = 2;
 						else
-							groupCubes.children[child+BinPow].renderOrder = 1;
+							groupCubes.children[child + BinPow].renderOrder = 1;
 					}
 			}
 			
@@ -341,6 +358,13 @@
 				expression = document.DataInput.exp.value;
 				//expression = '0123456789abcddefghijklmnopqrstuvw000000000000000000000000000000000000000000000000000123456789ABCDEFGHIJKLMNOPQRSTUVW'
 				var pos = [0,0,0];
+				groupPlanes.children = [];
+				Plane();
+				ctx.clearRect(0,0,400,400);
+				drawKarnaughcard(NumOfVars);
+				drawHalfCards(NumOfVars);
+				
+				
 				groupCubes.children = groupCubes.children.slice(0,BinPow);
 				
 				for(var child = 0; child < BinPow; child++)
@@ -362,8 +386,6 @@
 				{
 					ctx.clearRect(41 + poses[NumOfVars-1][child][0]*size, 41 +poses[NumOfVars-1][child][1]*size + (NumOfVars>4)*30,size-6,size-6);
 					
-					cell_groups[child] =[];
-					
 					groupCubes.children[child].material.color.r = 0.75;
 					groupCubes.children[child].material.color.g = 0.75;
 					groupCubes.children[child].material.color.b = 0.75;
@@ -374,13 +396,7 @@
 					
 					//Создание трехмерного текста
 					text3d = new THREE.TextGeometry(expression[child],{size: 15, height: 2, font: "gentilis", curveSegments: 1});
-					//
-					//!!!БАГ!!!
-					//
-						TextMaterial = new THREE.MeshBasicMaterial({color: 0x000000, overdraw: 0.5, opacity: 1, transparent: true});
-					//
-					//
-					//
+					TextMaterial = new THREE.MeshBasicMaterial({color: 0x000000, overdraw: 0.5, opacity: 1, transparent: true});
 					text = new THREE.Mesh(text3d, TextMaterial);
 					text.position.set(pos[0], pos[1], pos[2]);
 					text.renderOrder = 1;
@@ -391,12 +407,24 @@
 				}
 
 				scene.add(groupCubes);
+				scene.add(groupPlanes);
 				document.getElementById('group').innerHTML = '';
 			}
 			
 			//Создание ячеек(3D)
-			function Cube(MaxCount)
+			function Cube()
 			{
+							
+				//Вычисление разположения и размеров объектов сцены
+				var MaxCount = [1,1,1];
+				var MaxCountPx = [1,1,1];
+				
+				for(var i = 0; i < NumOfVars; i++)
+					MaxCountPx[i%3] *= 2;
+				
+				for(i = 2; i + 1; i--)
+					MaxCount[i] = (MaxCountPx[i] - 1)*(gap_plus_size)/2;
+
 				var pos = [0,0,0];
 				var StartCount = [0,0,0];
 				var end;
@@ -440,7 +468,7 @@
 					}
 					
 					for(var coor = 0; coor < 3; coor++)
-							pos[coor] = StartCount[coor];
+						pos[coor] = StartCount[coor];
 
 					//for(var j = 0; j <= (NumOfVars-1)%3; j++)
 					pos[count] -= Math.pow(-1,(shift%2))*gap_plus_size;
@@ -468,8 +496,23 @@
 			}
 			
 			//Создание плоскостей(3D)
-			function Plane(MaxCount,MaxCountPx)
+			function Plane()
 			{
+							
+				//Вычисление разположения и размеров объектов сцены
+				var MaxCount = [1,1,1];
+				var MaxCountPx = [1,1,1];
+				
+				for(var i = 0; i < NumOfVars; i++)
+					MaxCountPx[i%3] *= 2;
+				
+				for(i = 2; i + 1; i--)
+					MaxCount[i] = (MaxCountPx[i] - 1)*(gap_plus_size)/2;
+									
+				var buf = MaxCountPx.shift();
+				MaxCountPx.push(buf);
+				
+				var form = document.DataInput.MM.value;
 				var text_pos = [];
 				var TextMaterial = new THREE.MeshBasicMaterial({color: 0x000000, overdraw: 0.5, opacity: PlaneOpacity, transparent: true});
 				var material = new THREE.MeshBasicMaterial({color: 0x757575, overdraw: 0.5, opacity: PlaneOpacity, transparent: true});
@@ -477,7 +520,9 @@
 				//Вычисление расположения и размеров полукарт
 				for(i = 0; i < NumOfVars; i++)
 				{
-					var not = '¬';
+					var not = '';
+					if(form == '1')
+						var not = '¬';
 					var count = 2;
 					var plane_size = [size + (MaxCountPx[i%3] - 1)*gap_plus_size,size + gap_plus_size*Math.floor(NumOfVars/(4 + i))];
 					if(i < 3)
@@ -508,7 +553,9 @@
 						plane_pos[i%3] *= -1;
 						if(sign == 2)
 						{
-							not = '';
+							var not = '¬';
+							if(form == '1')
+								var not = '';
 							plane_pos[i%3] = 0;
 							plane_size[1] += gap_plus_size;
 						}
@@ -535,7 +582,11 @@
 							text_pos[2] = MaxCount[2] + 20
 							
 						if((i<3)&&(sign == 1))
-							not = '';
+						{
+							var not = '¬';
+							if(form == '1')
+								var not = '';
+						}
 						
 						var text3d = new THREE.TextGeometry(not + 'X' + i,{size: 5, height: 0.5, font: "gentilis", curveSegments: 1});
 						text = new THREE.Mesh(text3d, TextMaterial);
@@ -577,17 +628,20 @@
 						
 						cell_groups[GROUPS[value][cell]] = RemoveByName(cell_groups[GROUPS[value][cell]], colors_2D[value])
 						
-						ctx.globalAlpha = 1;
-						ctx.fillStyle = "black";
 						
-						ctx.fillText(expression[GROUPS[value][cell]],0.27*size + RectX + 40,RectY + 40 + (NumOfVars>4)*30 + 0.7*size);
 							
 						ctx.globalAlpha = 0.5;
 						for(var color = 0; color < cell_groups[GROUPS[value][cell]].length; color++)
 						{
+							ctx.globalAlpha *= 0.75;
 							ctx.fillStyle = cell_groups[GROUPS[value][cell]][color];
 							ctx.fillRect(41 + RectX, 41 + RectY + (NumOfVars>4)*30, size-6, size-6);
+							ctx.globalAlpha *= 0.75;
 						}
+						ctx.globalAlpha = 1;
+						ctx.fillStyle = "black";
+						
+						ctx.fillText(expression[GROUPS[value][cell]],0.27*size + RectX + 40,RectY + 40 + (NumOfVars>4)*30 + 0.7*size);
 					}
 				}
 			}
@@ -600,6 +654,11 @@
 				
 			function drawHalfCards(NumOfVars)
 			{
+				var form = document.DataInput.MM.value-0;
+				var InvSigns = ['','\u0305'];
+				
+				 if(form == '0')//Проверка на мкнф
+					InvSigns.reverse();
 				var height = Math.pow(2, Math.floor(NumOfVars/2));
 				var width = Math.pow(2, Math.ceil(NumOfVars/2));
 				var size = 45;
@@ -615,93 +674,93 @@
 						//x5
 						ctx.moveTo(80+width*size,70+height*size*0/8);
 						ctx.lineTo(80+width*size,70+height*size*1/8 - 5);
-						ctx.fillText('X' + '\u0305' + 5,80+width*size + 5,70+height*size*1/16 + 5);
+						ctx.fillText('X' + InvSigns[1] + 5,80+width*size + 5,70+height*size*1/16 + 5);
 							
 						ctx.moveTo(80+width*size,70+height*size*1/8);
 						ctx.lineTo(80+width*size,70+height*size*3/8 - 5);
-						ctx.fillText('X' + 5,80+width*size + 5,70+height*size*4/16 + 5);
+						ctx.fillText('X' + InvSigns[0] + 5,80+width*size + 5,70+height*size*4/16 + 5);
 							
 						ctx.moveTo(80+width*size,70+height*size*3/8);
 						ctx.lineTo(80+width*size,70+height*size*5/8 - 5);
-						ctx.fillText('X' + '\u0305' + 5,80+width*size + 5,70+height*size*8/16 + 5);
+						ctx.fillText('X' + InvSigns[1] + 5,80+width*size + 5,70+height*size*8/16 + 5);
 							
 						ctx.moveTo(80+width*size,70+height*size*5/8);
 						ctx.lineTo(80+width*size,70+height*size*7/8 - 5);
-						ctx.fillText('X' + 5,980+width*size + 5,70+height*size*12/16 + 5);
+						ctx.fillText('X' + InvSigns[0] + 5,980+width*size + 5,70+height*size*12/16 + 5);
 						
 						ctx.moveTo(80+width*size,70+height*size*7/8);
 						ctx.lineTo(80+width*size,70+height*size*8/8 - 5);
-						ctx.fillText('X' + '\u0305' + 5,80+width*size + 5,70+height*size*15/16 + 5);
+						ctx.fillText('X' + InvSigns[1] + 5,80+width*size + 5,70+height*size*15/16 + 5);
 							
 					case "5":
 						//x4
 						ctx.moveTo(40+width*size*0/8,	35);
 						ctx.lineTo(40+width*size*1/8 - 5,35);
-						ctx.fillText('X' + '\u0305' + 4,40+width*size*1/16 - 10,30);
+						ctx.fillText('X' + InvSigns[1] + 4,40+width*size*1/16 - 10,30);
 						
 						ctx.moveTo(40+width*size*1/8,	35);
 						ctx.lineTo(40+width*size*3/8 - 5,35);
-						ctx.fillText('X' + 4,40+width*size*4/16 - 10,30);
+						ctx.fillText('X' + InvSigns[0] + 4,40+width*size*4/16 - 10,30);
 							
 						ctx.moveTo(40+width*size*3/8,	35);
 						ctx.lineTo(40+width*size*5/8 - 5,35);
-						ctx.fillText('X' + '\u0305' + 4,40+width*size*8/16 - 10,30);
+						ctx.fillText('X' + InvSigns[1] + 4,40+width*size*8/16 - 10,30);
 							
 						ctx.moveTo(40+width*size*5/8,	35);
 						ctx.lineTo(40+width*size*7/8 - 5,35);
-						ctx.fillText('X' + 4,40+width*size*12/16 - 10,30);
+						ctx.fillText('X' + InvSigns[0] + 4,40+width*size*12/16 - 10,30);
 						
 						ctx.moveTo(40+width*size*7/8,	35);
 						ctx.lineTo(40+width*size*8/8 - 5,35);
-						ctx.fillText('X' + '\u0305' + 4,40+width*size*15/16 - 10,30);
+						ctx.fillText('X' + InvSigns[1] + 4,40+width*size*15/16 - 10,30);
 					
 					case "4":
 						//x3
 						ctx.moveTo(35,40+height*size*0/4 + (NumOfVars>4)*30);
 						ctx.lineTo(35,40+height*size*1/4 - 5 + (NumOfVars>4)*30);
-						ctx.fillText('X' + '\u0305' + 3,5,40+height*size*1/8 + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[1] + 3,5,40+height*size*1/8 + (NumOfVars>4)*30);
 							
 						ctx.moveTo(35,40+height*size*1/4 + (NumOfVars>4)*30);
 						ctx.lineTo(35,40+height*size*3/4 - 5 + (NumOfVars>4)*30);
-						ctx.fillText('X' + 3,5,40+height*size*4/8 + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[0] + 3,5,40+height*size*4/8 + (NumOfVars>4)*30);
 						
 						ctx.moveTo(35,40+height*size*3/4 + (NumOfVars>4)*30);
 						ctx.lineTo(35,40+height*size*4/4 - 5 + (NumOfVars>4)*30);
-						ctx.fillText('X' + '\u0305' + 3,5,40+height*size*7/8 + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[1] + 3,5,40+height*size*7/8 + (NumOfVars>4)*30);
 						
 					case "3":
 						//x2
 						ctx.moveTo(40+width*size*0/4,	40+height*size + (NumOfVars>4)*30);
 						ctx.lineTo(40+width*size*1/4 - 5,40+height*size + (NumOfVars>4)*30);
-						ctx.fillText('X' + '\u0305' + 2,40+width*size*1/8 - 10,40+height*size + 25 + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[1] + 2,40+width*size*1/8 - 10,40+height*size + 25 + (NumOfVars>4)*30);
 							
 						ctx.moveTo(40+width*size*1/4,	40+height*size + (NumOfVars>4)*30);
 						ctx.lineTo(40+width*size*3/4 - 5,40+height*size + (NumOfVars>4)*30);
-						ctx.fillText('X' + 2,40+width*size*4/8 - 10,40+height*size + 25 + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[0] + 2,40+width*size*4/8 - 10,40+height*size + 25 + (NumOfVars>4)*30);
 						
 						ctx.moveTo(40+width*size*3/4,	40+height*size + (NumOfVars>4)*30);
 						ctx.lineTo(40+width*size*4/4 - 5,40+height*size + (NumOfVars>4)*30);
-						ctx.fillText('X' + '\u0305' + 2,40+width*size*7/8 - 10,40+height*size + 25 + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[1] + 2,40+width*size*7/8 - 10,40+height*size + 25 + (NumOfVars>4)*30);
 							
 					case "2":
 						//x1
 						ctx.moveTo(40+width*size,40+height*size*0/2 + (NumOfVars>4)*30);
 						ctx.lineTo(40+width*size,40+height*size*1/2 - 5 + (NumOfVars>4)*30);
-						ctx.fillText('X' + 1,50+width*size,40+height*size*1/4 + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[0] + 1,50+width*size,40+height*size*1/4 + (NumOfVars>4)*30);
 							
 						ctx.moveTo(40+width*size,40+height*size*1/2 + (NumOfVars>4)*30);
 						ctx.lineTo(40+width*size,40+height*size*2/2 - 5 + (NumOfVars>4)*30);
-						ctx.fillText('X' + '\u0305' + 1,50+width*size,40+height*size*3/4 + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[1] + 1,50+width*size,40+height*size*3/4 + (NumOfVars>4)*30);
 						
 					case "1":
 						//x0
 						ctx.moveTo(40+width*size*0/2,35 + (NumOfVars>4)*30);
 						ctx.lineTo(40+width*size*1/2 -5,35 + (NumOfVars>4)*30);
-						ctx.fillText('X' + 0,40+width*size*1/4 - 10,30 + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[0] + 0,40+width*size*1/4 - 10,30 + (NumOfVars>4)*30);
 						
 						ctx.moveTo(40+width*size*1/2 + (NumOfVars>5)*5,35 + (NumOfVars>4)*30);
 						ctx.lineTo(40+width*size*2/2 - 5 + (NumOfVars>5)*5,35 + (NumOfVars>4)*30);
-						ctx.fillText('X' + '\u0305' + 0,40+width*size*3/4  + (NumOfVars>5)*5 - 10,30 + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[1] + 0,40+width*size*3/4  + (NumOfVars>5)*5 - 10,30 + (NumOfVars>4)*30);
 				}
 				
 				ctx.stroke();
