@@ -209,8 +209,6 @@ function MakeLogExpression(groups)
     //return expression.join(BracketOps[1]);
 }
 
-
-
         /*  
 		Старый алгоритм!!!
 		
