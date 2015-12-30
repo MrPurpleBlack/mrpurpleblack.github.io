@@ -1,4 +1,4 @@
-<html>
+﻿<html>
     <head>
         <title>Визуализация карт Карно</title>
         <meta content="text/html; charset=utf-8" />
@@ -38,6 +38,7 @@
                             <input type="button" value="Вычислить" onclick="
 							ReloadValues();
 							GROUPS = calculate(); 
+							console.log(GROUPS);
 							list_of_groups = MakeLogExpression(GROUPS); 
 							Group(); 
 							document.OutputData.ret.value = list_of_groups.join(out_br);
@@ -145,16 +146,15 @@
 			
 			var canvas = document.getElementById("2DimKC");
 			var ctx = canvas.getContext("2d");
-			
-			var colors_2D = ["#ff0000","#44ff44","#00ffff","#ff00ff",  "#8800ff", "#ff8800",   "#00ff00","#0000ff","#ffff00", "#ff44ff",  "#4444ff",  "#c0c000",  "#440000",  "#004400",  "#000044","#888888"]
-			
-			var colors = [   [2,0,0], [0.5,2,0.5],[2,2,0],  [0,2,2],    [2,0,2],  [0.5,0,1],    [0,2,0],   [2,0.5,2], [2,2,0], [0,0,2],  [0.5,0.5,2],  [1,1,0],   [0.5,0,0],  [0,0.5,0],  [0,0,0.5], [1,1,1]];
+						
+			var colors = [[2,0,0],[0.5,2,0.5],[0,2,2],[2,0,2],[0.5,0,1],[0,2,0],[2,2,0],[2,0.5,2],[2,2,0],[0,0,2],[0.5,0.5,2],[1,1,0],[0.5,0,0],[0,0.5,0],[0,0,0.5],[1,1,1]];
 			
 			var group_colors = [];
 			
 			//var cur_year = 1970+Math.floor(new Date().getTime()/(1000*60*60*24*365));
 			//alert("Год:" + cur_year);
 			
+			//1010110011010101 - ошибка
 			
 			/*
 			<details>
@@ -216,7 +216,7 @@
 				window.addEventListener('resize', onWindowResize, false);
 				console.log(scene)
 			}
-			
+					
 			//Визуализация групп ячеек 
 			function Group()//3 4 5 6
 			{
@@ -230,16 +230,12 @@
 				}
 					
 				document.getElementById('group').innerHTML += '<p><input type="checkbox" name="groupAll" value="All" onchange="onAllGroupsChange()" checked>Все группы</p>';
-				ctx.globalAlpha = 0.5;
 				for(var group = 0; group < GROUPS.length; group++)
 				{
 					for(var cell = 0; cell < GROUPS[group].length; cell++)
 					{
-						ctx.globalAlpha = 0.5;
-						ctx.fillStyle = colors_2D[group];
-						cell_groups[GROUPS[group][cell]].push(colors_2D[group]);
-						ctx.fillRect(41 +poses[NumOfVars-1][GROUPS[group][cell]][0]*size,41 + poses[NumOfVars-1][GROUPS[group][cell]][1]*size + (NumOfVars>4)*30,size-6,size-6);
-						
+						var RectX = poses[NumOfVars-1][GROUPS[group][cell]][0]*size;
+						var RectY = poses[NumOfVars-1][GROUPS[group][cell]][1]*size;
 						
 						groupCubes.children[GROUPS[group][cell]].material.color.r *= group_colors[GROUPS[group][cell]];
 						groupCubes.children[GROUPS[group][cell]].material.color.g *= group_colors[GROUPS[group][cell]];
@@ -259,11 +255,20 @@
 							
 						groupCubes.children[GROUPS[group][cell]].material.color.b /= group_colors[GROUPS[group][cell]];
 						
+						ctx.clearRect(41 + RectX, 41 + RectY + (NumOfVars>4)*30, size-6, size-6);
+						
+						ctx.globalAlpha = 0.7;
+						console.log('rgb('+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.b*255)+')');
+						ctx.fillStyle = 'rgb('+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.b*255)+')';
+						
+						ctx.fillRect(41 + RectX,41 + RectY + (NumOfVars>4)*30,size-6,size-6);
+						
+						
 						ctx.globalAlpha = 1;
 						ctx.fillStyle = "black";	
-						ctx.fillText(expression[GROUPS[group][cell]],0.275*size + poses[NumOfVars-1][GROUPS[group][cell]][0]*size + 40,poses[NumOfVars-1][GROUPS[group][cell]][1]*size + 40 + (NumOfVars>4)*30 + 0.7*size);
+						ctx.fillText(expression[GROUPS[group][cell]],0.27*size + RectX + 40,RectY + 40 + (NumOfVars>4)*30 + 0.7*size);
 					}
-					document.getElementById('group').innerHTML += '<p><input type="checkbox" name="group' + group + '" value="' + group + '" onchange="onGroupChange2D(document.KarnaughSets.group' + group + '.value,document.KarnaughSets.group' + group + '.checked);onGroupChange3D(document.KarnaughSets.group' + group + '.value,document.KarnaughSets.group' + group + '.checked)" checked>' + list_of_groups[group] + '</p>';
+					document.getElementById('group').innerHTML += '<p><input type="checkbox" name="group' + group + '" value="' + group + '" onchange="onGroupChange(document.KarnaughSets.group' + group + '.value,document.KarnaughSets.group' + group + '.checked)" checked>' + list_of_groups[group] + '</p>';
 				}
 				console.log(document.KarnaughSets);
 			}
@@ -279,17 +284,25 @@
 					if(groupCont[checkbox].checked != groupCont.groupAll.checked)
 					{
 						groupCont[checkbox].checked = groupCont.groupAll.checked;
-						onGroupChange2D(checkbox-3, groupCont.groupAll.checked);
-						onGroupChange3D(checkbox-3, groupCont.groupAll.checked);
+						onGroupChange(checkbox-3, groupCont.groupAll.checked);
 					}
 				}
 			}
 			
-			function onGroupChange3D(value, checked)
+			function onGroupChange(value, checked)
 			{
+				var size = 45;
+				ctx.font = '30px sans-serif';
+				if(NumOfVars > 4)
+				{
+					size = 35;
+					ctx.font = '20px sans-serif';
+				}
 				
 				for(var cell = 0; cell < GROUPS[value].length; cell++) 
 				{
+					var RectX = poses[NumOfVars-1][GROUPS[value][cell]][0]*size;
+					var RectY = poses[NumOfVars-1][GROUPS[value][cell]][1]*size;
 
 					groupCubes.children[GROUPS[value][cell]].material.color.r *= group_colors[GROUPS[value][cell]];
 					groupCubes.children[GROUPS[value][cell]].material.color.g *= group_colors[GROUPS[value][cell]];
@@ -304,7 +317,18 @@
 					groupCubes.children[GROUPS[value][cell]].material.color.r /= group_colors[GROUPS[value][cell]];
 					groupCubes.children[GROUPS[value][cell]].material.color.g /= group_colors[GROUPS[value][cell]];
 					groupCubes.children[GROUPS[value][cell]].material.color.b /= group_colors[GROUPS[value][cell]];
-
+					
+					ctx.clearRect(41 + RectX, 41 + RectY + (NumOfVars>4)*30, size-6, size-6);
+						
+					ctx.globalAlpha = 0.7;
+					console.log('rgb('+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.b*255)+')');
+					ctx.fillStyle = 'rgb('+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.b*255)+')';
+						
+					ctx.fillRect(41 + RectX,41 + RectY + (NumOfVars>4)*30,size-6,size-6);
+						
+					ctx.globalAlpha = 1;
+					ctx.fillStyle = "black";	
+					ctx.fillText(expression[GROUPS[value][cell]],0.27*size + RectX + 40,RectY + 40 + (NumOfVars>4)*30 + 0.7*size);
 				}
 			}
 			
@@ -591,46 +615,6 @@
 				}
 			}
 			
-			function onGroupChange2D(value, checked)
-			{
-				var size = 45;
-				if(NumOfVars > 4)
-				{
-					size = 35;
-					ctx.font = '20px sans-serif';
-				}
-				
-				for(var cell = 0; cell < GROUPS[value].length; cell++) 
-				{
-					var RectX = poses[NumOfVars-1][GROUPS[value][cell]][0]*size;
-					var RectY = poses[NumOfVars-1][GROUPS[value][cell]][1]*size;
-					
-					if(checked)
-					{
-						ctx.globalAlpha = 0.5;
-						ctx.fillStyle = colors_2D[value];
-						cell_groups[GROUPS[value][cell]].push(colors_2D[value]);
-						ctx.fillRect( 41 + RectX, 41 + RectY + (NumOfVars>4)*30, size-6, size-6);
-					}
-					else
-					{							
-						ctx.clearRect(41 + RectX, 41 + RectY + (NumOfVars>4)*30, size-6, size-6);
-						cell_groups[GROUPS[value][cell]] = RemoveByName(cell_groups[GROUPS[value][cell]], colors_2D[value])
-	
-						ctx.globalAlpha = 0.5;
-						for(var color = 0; color < cell_groups[GROUPS[value][cell]].length; color++)
-						{
-							ctx.fillStyle = cell_groups[GROUPS[value][cell]][color];
-							ctx.fillRect(41 + RectX, 41 + RectY + (NumOfVars>4)*30, size-6, size-6);
-							//ctx.globalAlpha *= 0.75;
-						}
-					}
-					ctx.globalAlpha = 1;
-					ctx.fillStyle = "black";	
-					ctx.fillText(expression[GROUPS[value][cell]],0.275*size + RectX + 40,RectY + 40 + (NumOfVars>4)*30 + 0.7*size);
-				}
-			}
-				
 			function RemoveByName(array,value)
 			{
 				var piv = array.indexOf(value);
@@ -759,10 +743,12 @@
 				var size = 45;
 				if(NumOfVars > 4)
 					size = 35;
-					
+				
+				ctx.globalAlpha = 0.7;
+				ctx.fillStyle = "rgb(192,192,192)";
 				function Cell(pos)
 				{
-					ctx.strokeRect(pos[0]*size + 40.5,pos[1]*size + 40.5 + (NumOfVars>4)*30, size-5, size-5);
+					ctx.fillRect(pos[0]*size + 40.5,pos[1]*size + 40.5 + (NumOfVars>4)*30, size-5, size-5);
 				}
 
 				for(var i =0; i< Math.pow(2,NumOfVars);i++)
