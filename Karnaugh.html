@@ -54,9 +54,8 @@
 							<p>
 							<b>Случайный пример</b><br>
 							<input type="button" value="Показать пример" onclick="
-							var num = Math.round((Math.random()*10)%4);
+							var num = Math.round((Math.random()*4)%4);
 							
-							alert(num)
 							if(examples[num].length == 32)
 								document.DataInput.NumOfVars.value = '5';
 							else
