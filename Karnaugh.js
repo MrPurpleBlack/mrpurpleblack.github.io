@@ -32,8 +32,8 @@ function calculate()
     for(var iter = 0; iter < NumOfVars + 2; iter++)
     {
 		groups = CheckGroups(groups);
-        var buf = groups.shift();
-        groups.push(buf);
+        var buf = groups.pop();
+        groups.unshift(buf);
     }
 	return groups
 }

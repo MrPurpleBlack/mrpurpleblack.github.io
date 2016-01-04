@@ -51,7 +51,29 @@
 								<h5>отправьте краткий репорт по адресу</h5>
 								<h5>mrpurpleblack@gmail.com</h5>
 							</details>
+							<p>
+							<b>Случайный пример</b><br>
+							<input type="button" value="Показать пример" onclick="
+							var num = Math.round((Math.random()*10)%4);
 							
+							alert(num)
+							if(examples[num].length == 32)
+								document.DataInput.NumOfVars.value = '5';
+							else
+								document.DataInput.NumOfVars.value = '6';
+								
+							ValNumChange(document.DataInput.NumOfVars.value); 
+							ReloadKC();
+							
+							document.DataInput.exp.value = examples[num];
+							ReloadValues();
+							GROUPS = calculate(); 
+							console.log(GROUPS);
+							list_of_groups = MakeLogExpression(GROUPS); 
+							Group(); 
+							document.OutputData.ret.value = list_of_groups.join(out_br);
+							">
+							</p>
 							
                         </div>
                     </form>    
@@ -156,18 +178,8 @@
 			
 			//1010110011010101 - ошибка
 			
-			/*
-			<details>
-				<summary><span>Неочевидные соседние ячейки</span></summary>
-				<span>Для 5 переменных</span>
-				<span>00110000000000000011000000000000</span>
-				<span>00010001000000000001000100000000</span>
-				<span>Для 6 переменных</span>
-				<span>0001000000000000000100000000000000010000000000000001000000000000</span>
-				<span>0001000100010001000100010001000100010001000100010001000100010001</span>
-			</details>
-			
-			*/
+			var examples = ['00110000000000000011000000000000','00010001000000000001000100000000','0001000000000000000100000000000000010000000000000001000000000000','0001000100010001000100010001000100010001000100010001000100010001'];
+
 			init();
 			animate();
 			
@@ -258,7 +270,7 @@
 						ctx.clearRect(41 + RectX, 41 + RectY + (NumOfVars>4)*30, size-6, size-6);
 						
 						ctx.globalAlpha = 0.7;
-						console.log('rgb('+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.b*255)+')');
+						//console.log('rgb('+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.b*255)+')');
 						ctx.fillStyle = 'rgb('+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.b*255)+')';
 						
 						ctx.fillRect(41 + RectX,41 + RectY + (NumOfVars>4)*30,size-6,size-6);
@@ -270,17 +282,17 @@
 					}
 					document.getElementById('group').innerHTML += '<p><input type="checkbox" name="group' + group + '" value="' + group + '" onchange="onGroupChange(document.KarnaughSets.group' + group + '.value,document.KarnaughSets.group' + group + '.checked)" checked>' + list_of_groups[group] + '</p>';
 				}
-				console.log(document.KarnaughSets);
+				//console.log(document.KarnaughSets);
 			}
 			
 			function onAllGroupsChange()
 			{
 				
 				var groupCont = document.KarnaughSets;
-				console.log(groupCont.length);
+				//console.log(groupCont.length);
 				for(var checkbox = 3; checkbox < groupCont.length; checkbox++)
 				{
-					console.log(groupCont[checkbox].value);
+					//console.log(groupCont[checkbox].value);
 					if(groupCont[checkbox].checked != groupCont.groupAll.checked)
 					{
 						groupCont[checkbox].checked = groupCont.groupAll.checked;
@@ -321,7 +333,7 @@
 					ctx.clearRect(41 + RectX, 41 + RectY + (NumOfVars>4)*30, size-6, size-6);
 						
 					ctx.globalAlpha = 0.7;
-					console.log('rgb('+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.b*255)+')');
+					//console.log('rgb('+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.b*255)+')');
 					ctx.fillStyle = 'rgb('+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.b*255)+')';
 						
 					ctx.fillRect(41 + RectX,41 + RectY + (NumOfVars>4)*30,size-6,size-6);
