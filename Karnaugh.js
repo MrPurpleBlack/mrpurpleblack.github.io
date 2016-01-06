@@ -17,7 +17,7 @@ function calculate()
 				continue;
 			default:
 				alert("Таблица истинности заполнена неверными значениями!");//Ошибка - недопустимое значение
-				return '';
+				return "ДА ПОЧЕМУ НЕ РАБОТАЕТ?";
 		}
     }
 	//Вывод исключительных выражений
@@ -32,8 +32,8 @@ function calculate()
     for(var iter = 0; iter < NumOfVars + 2; iter++)
     {
 		groups = CheckGroups(groups);
-        var buf = groups.pop();
-        groups.unshift(buf);
+        var buf = groups.shift();
+        groups.push(buf);
     }
 	return groups
 }
@@ -158,7 +158,7 @@ function CheckGroups(groups)
             }
         }
     }
-    return NewGroups.sort(function(a,b){return b.length - a.length})
+    return NewGroups/*.sort(function(a,b){return b.length - a.length})*/
 }
         
 function MakeLogExpression(groups)

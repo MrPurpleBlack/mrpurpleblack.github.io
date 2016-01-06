@@ -36,9 +36,11 @@
                             МКНФ 
                             </p>
                             <input type="button" value="Вычислить" onclick="
-							ReloadValues();
 							GROUPS = calculate(); 
 							console.log(GROUPS);
+							if(GROUPS == 'ДА ПОЧЕМУ НЕ РАБОТАЕТ?')
+								return 0;
+							ReloadValues();
 							list_of_groups = MakeLogExpression(GROUPS); 
 							Group(); 
 							document.OutputData.ret.value = list_of_groups.join(out_br);
@@ -54,7 +56,7 @@
 							<p>
 							<b>Случайный пример</b><br>
 							<input type="button" value="Показать пример" onclick="
-							var num = Math.round((Math.random()*4)%4);
+							var num = Math.round((Math.random()*10000))%4;
 							
 							if(examples[num].length == 32)
 								document.DataInput.NumOfVars.value = '5';
@@ -148,7 +150,6 @@
 			var GROUPS = [];
 			var list_of_groups = [];
 			
-			var cell_groups = [];
 			var poses = [
 			[[1,0],[0,0]],
 			[[1,1],[1,0],[0,1],[0,0]],
@@ -228,6 +229,11 @@
 				console.log(scene)
 			}
 					
+			function but_click()
+			{
+				
+			}
+			
 			//Визуализация групп ячеек 
 			function Group()//3 4 5 6
 			{
@@ -376,10 +382,6 @@
 				
 				document.KarnaughSets.EmptyCellOpacity.value = 0.7;
 				
-				ctx.globalAlpha = 1;
-				cell_colors = [];
-				cell_groups = [];
-				
 				groupCubes = new THREE.Group();
 				groupPlanes = new THREE.Group();
 				container.removeChild(renderer.domElement);
@@ -390,9 +392,10 @@
 			
 			//Перезагрузка значений
 			function ReloadValues()
-			{
+			{				
 				NumOfVars = document.DataInput.NumOfVars.value;
 				BinPow = Math.pow(2,NumOfVars);
+				
 				expression = document.DataInput.exp.value;
 				//expression = '0123456789abcddefghijklmnopqrstuvw000000000000000000000000000000000000000000000000000123456789ABCDEFGHIJKLMNOPQRSTUVW'
 				groupPlanes.children = [];
@@ -422,6 +425,7 @@
 					groupCubes.children[child].material.color.r = 0.75;
 					groupCubes.children[child].material.color.g = 0.75;
 					groupCubes.children[child].material.color.b = 0.75;
+					group_colors[child] = 1;
 					
 					//Создание трехмерного текста
 					text3d = new THREE.TextGeometry(expression[child],{size: 15, height: 2, font: "gentilis", curveSegments: 1});
@@ -763,10 +767,7 @@
 				}
 
 				for(var i =0; i< Math.pow(2,NumOfVars);i++)
-				{
 					Cell(poses[NumOfVars-1][i]);
-					cell_groups.push([]);
-				}
 			}
 			
 			function onWindowResize()
