@@ -28,13 +28,15 @@
                                 <option value="5" > 5 переменные </option>
                                 <option value="6" > 6 переменные </option>
                             </select>
-                            <p>
-                            <b>Метод минимизации</b><br>
-                            <input name="MM" type="radio" value="1" checked>
-                            МДНФ<br>
-                            <input name="MM" type="radio" value="0">
-                            МКНФ 
-                            </p>
+							<div class="radio">
+								<p>
+								<b>Метод минимизации</b><br>
+								<input id="MDNF" name="MM" type="radio" value="1" checked>
+								<label for="MDNF">МДНФ</label><br>
+								<input id="MKNF" name="MM" type="radio" value="0">
+								<label for="MKNF">МКНФ</label><br>
+								</p>
+							</div>
                             <input type="button" value="Вычислить" onclick="
 							GROUPS = calculate(); 
 							console.log(GROUPS);
@@ -229,11 +231,6 @@
 				console.log(scene)
 			}
 					
-			function but_click()
-			{
-				
-			}
-			
 			//Визуализация групп ячеек 
 			function Group()//3 4 5 6
 			{
@@ -246,7 +243,7 @@
 					ctx.font = '20px sans-serif';
 				}
 					
-				document.getElementById('group').innerHTML += '<p><input type="checkbox" name="groupAll" value="All" onchange="onAllGroupsChange()" checked>Все группы</p>';
+				document.getElementById('group').innerHTML += '<p><input type="checkbox" name="groupAll" id="groupAll" value="All" onchange="onAllGroupsChange()" checked><label for="groupAll">Все группы</label><br></p>';
 				for(var group = 0; group < GROUPS.length; group++)
 				{
 					for(var cell = 0; cell < GROUPS[group].length; cell++)
@@ -285,7 +282,7 @@
 						ctx.fillStyle = "black";	
 						ctx.fillText(expression[GROUPS[group][cell]],0.27*size + RectX + 40,RectY + 40 + (NumOfVars>4)*30 + 0.7*size);
 					}
-					document.getElementById('group').innerHTML += '<p><input type="checkbox" name="group' + group + '" value="' + group + '" onchange="onGroupChange(document.KarnaughSets.group' + group + '.value,document.KarnaughSets.group' + group + '.checked)" checked>' + list_of_groups[group] + '</p>';
+					document.getElementById('group').innerHTML += '<p><input type="checkbox"  id=group'+group+' name="group' + group + '" value="' + group + '" onchange="onGroupChange(document.KarnaughSets.group' + group + '.value,document.KarnaughSets.group' + group + '.checked)" checked><label for="group'+group+'">' + list_of_groups[group] + '</label><br></p>';
 				}
 				//console.log(document.KarnaughSets);
 			}

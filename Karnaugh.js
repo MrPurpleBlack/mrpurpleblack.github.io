@@ -176,7 +176,7 @@ function MakeLogExpression(groups)
     }
 	out_br = BracketOps[1];
 	
-	if((groups.length == 0) || (groups[0].length == Math.pow(2,NumOfVars))) return ['X\u2080 ' + BracketOps[+(groups.length == 0)] + ' \u0305X\u2080'];
+	if((groups.length == 0) || (groups[0].length == Math.pow(2,NumOfVars))) return ['X\u2080 ' + BracketOps[+(groups.length != 0)] + ' \u0305X\u2080'];
 	
     var expression = [];
     var UnicodeIndex = ['\u2080','\u2081','\u2082','\u2083','\u2084','\u2085'];
