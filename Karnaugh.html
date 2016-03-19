@@ -90,9 +90,8 @@
             <div id="output">    
                 <fieldset>
                     <legend>Вывод</legend>
-                    <form name="OutputData">
-                        <textarea id="ret" readonly="true"></textarea>
-						
+					<div id="OutputData">
+					</div>
                     </form> 
                 </fieldset>
             </div>
@@ -153,6 +152,7 @@
 				[0,0],[0,1],[1,0],[1,1],[0,3],[0,2],[1,3],[1,2],[3,0],[3,1],[2,0],[2,1],[3,3],[3,2],[2,3],[2,2]]
 			];
 
+			var X_shift = 160-45*Math.ceil(NumOfVars/2)-15*(NumOfVars==6);
 			var groupCubes = new THREE.Group();
 			var groupPlanes = new THREE.Group();
 			
@@ -176,6 +176,8 @@
 			//Инициализация рабочей области
 			function init()
 			{
+				X_shift = 160-45*Math.ceil(NumOfVars/2)-15*(NumOfVars==6);
+				
 				//Инициализация контейнера
 				container = document.getElementById('container');
 				
@@ -197,6 +199,8 @@
 				scene.add(groupPlanes);
 				
 				//Создание двухмерной модели КК
+				canvas = document.getElementById("2DimKC");
+				ctx = canvas.getContext("2d");
 				ctx.clearRect(0,0,400,400);
 				drawKarnaughcard(NumOfVars);
 				drawHalfCards(NumOfVars);
@@ -207,6 +211,7 @@
 					renderer = new THREE.WebGLRenderer({antialias:true});
 					renderer.clearDepth();
 				}
+				else
 					renderer = new THREE.CanvasRenderer();
 					
 				renderer.setClearColor(0xffffff);
@@ -218,10 +223,8 @@
 				container.addEventListener('mousedown', onDocumentMouseDown, false);
 				container.addEventListener('touchstart', onDocumentTouchStart, false);
 				container.addEventListener('touchmove', onDocumentTouchMove, false);
-				
-				//Событие изменения размера окна
-				window.addEventListener('resize', onWindowResize, false);
-				console.log(scene)
+
+				//console.log(scene)
 			}
 					
 			//Визуализация групп ячеек 
@@ -241,7 +244,7 @@
 				{
 					for(var cell = 0; cell < GROUPS[group].length; cell++)
 					{
-						var RectX = poses[NumOfVars-1][GROUPS[group][cell]][0]*size;
+						var RectX = X_shift+poses[NumOfVars-1][GROUPS[group][cell]][0]*size;
 						var RectY = poses[NumOfVars-1][GROUPS[group][cell]][1]*size;
 						
 						groupCubes.children[GROUPS[group][cell]].material.color.r *= group_colors[GROUPS[group][cell]];
@@ -251,15 +254,12 @@
 						group_colors[GROUPS[group][cell]]++;
 						
 						groupCubes.children[GROUPS[group][cell]].material.color.r += colors[group%16][0];
-							
 						groupCubes.children[GROUPS[group][cell]].material.color.r /= group_colors[GROUPS[group][cell]];
 							
 						groupCubes.children[GROUPS[group][cell]].material.color.g += colors[group%16][1];
-							
 						groupCubes.children[GROUPS[group][cell]].material.color.g /= group_colors[GROUPS[group][cell]];
 						
 						groupCubes.children[GROUPS[group][cell]].material.color.b += colors[group%16][2];
-							
 						groupCubes.children[GROUPS[group][cell]].material.color.b /= group_colors[GROUPS[group][cell]];
 						
 						ctx.clearRect(41 + RectX, 41 + RectY + (NumOfVars>4)*30, size-6, size-6);
@@ -285,14 +285,18 @@
 			
 			function KAL()
 			{
-				GROUPS = calculate(); 
-				console.log(GROUPS);
-				if(GROUPS == 'ДА ПОЧЕМУ НЕ РАБОТАЕТ?')
+				var group_of_groups = calculate();
+				//console.log(GROUPS);
+				GROUPS = group_of_groups[0];
+				if(group_of_groups === 0)
 					return 0;
 				ReloadValues();
-				list_of_groups = MakeLogExpression(GROUPS); 
+				for(var i = 0; i < group_of_groups.length; i++)
+				{
+					list_of_groups = MakeLogExpression(group_of_groups[i]); 
+					document.getElementById("OutputData").innerHTML += "<div id='VarRow'>"+list_of_groups.join(out_br)+"</div>";
+				}
 				Group(); 
-				document.OutputData.ret.value = list_of_groups.join(out_br);
 			}
 			
 			function onAllGroupsChange()
@@ -323,7 +327,7 @@
 				
 				for(var cell = 0; cell < GROUPS[value].length; cell++) 
 				{
-					var RectX = poses[NumOfVars-1][GROUPS[value][cell]][0]*size;
+					var RectX = X_shift+poses[NumOfVars-1][GROUPS[value][cell]][0]*size;
 					var RectY = poses[NumOfVars-1][GROUPS[value][cell]][1]*size;
 
 					groupCubes.children[GROUPS[value][cell]].material.color.r *= group_colors[GROUPS[value][cell]];
@@ -381,6 +385,7 @@
 			//Переинициализация
 			function ReloadKC()
 			{
+				document.getElementById("OutputData").innerHTML = '';
 				NumOfVars = document.DataInput.NumOfVars.value;
 				BinPow = Math.pow(2,NumOfVars);
 				PlaneOpacity = document.KarnaughSets.PlaneOpacity.value;
@@ -394,6 +399,8 @@
 				delete container;
 				delete camera;
 				delete renderer;
+				delete ctx;
+				delete canvas;
 				document.getElementById('group').innerHTML = '';
 				init();
 				animate();
@@ -401,7 +408,8 @@
 			
 			//Перезагрузка значений
 			function ReloadValues()
-			{				
+			{			
+				document.getElementById("OutputData").innerHTML = '';
 				NumOfVars = document.DataInput.NumOfVars.value;
 				BinPow = Math.pow(2,NumOfVars);
 				
@@ -423,6 +431,7 @@
 				ctx.font = '30px sans-serif';
 				ctx.fillStyle = "black";
 				ctx.globalAlpha = 1; 
+				
 				
 				var size = 45;
 				if(NumOfVars > 4)
@@ -447,11 +456,13 @@
 					groupCubes.add(text);
 					
 					//Создание двухмерного текста
-					ctx.fillText(expression[child],0.27*size + poses[NumOfVars-1][child][0]*size + 40,poses[NumOfVars-1][child][1]*size + 40 + (NumOfVars>4)*30 + 0.7*size);
+					ctx.fillText(expression[child],X_shift+0.27*size + poses[NumOfVars-1][child][0]*size + 40,poses[NumOfVars-1][child][1]*size + 40 + (NumOfVars>4)*30 + 0.7*size);
 				}
 
 				scene.add(groupCubes);
 				scene.add(groupPlanes);
+				delete groupCubes;
+				delete groupPlanes;
 				document.getElementById('group').innerHTML = '';
 			}
 			
@@ -641,18 +652,12 @@
 				}
 			}
 			
-			function RemoveByName(array,value)
-			{
-				var piv = array.indexOf(value);
-				return array.slice(0, piv).concat(array.slice(piv+1))
-			}
-				
 			function drawHalfCards(NumOfVars)
 			{
 				var form = document.DataInput.MM.value-0;
 				var InvSigns = ['','\u0305'];
 				
-				 if(form == '0')//Проверка на мкнф
+				if(form == '0')//Проверка на мкнф
 					InvSigns.reverse();
 				var height = Math.pow(2, Math.floor(NumOfVars/2));
 				var width = Math.pow(2, Math.ceil(NumOfVars/2));
@@ -662,100 +667,101 @@
 				
 				ctx.font = '20px sans-serif';
 				ctx.fillStyle = "black";
-				ctx.beginPath();
+				ctx.beginPath();			
+				
 				switch(NumOfVars)
 				{
 					case "6":
 						//x5
-						ctx.moveTo(80+width*size,70+height*size*0/8);
-						ctx.lineTo(80+width*size,70+height*size*1/8 - 5);
-						ctx.fillText('X' + InvSigns[1] + 5,80+width*size + 5,70+height*size*1/16 + 5);
+						ctx.moveTo(X_shift+80+width*size,70+height*size*0/8);
+						ctx.lineTo(X_shift+80+width*size,70+height*size*1/8 - 5);
+						ctx.fillText('X' + InvSigns[1] + 5,X_shift+80+width*size + 5,70+height*size*1/16 + 5);
 							
-						ctx.moveTo(80+width*size,70+height*size*1/8);
-						ctx.lineTo(80+width*size,70+height*size*3/8 - 5);
-						ctx.fillText('X' + InvSigns[0] + 5,80+width*size + 5,70+height*size*4/16 + 5);
+						ctx.moveTo(X_shift+80+width*size,70+height*size*1/8);
+						ctx.lineTo(X_shift+80+width*size,70+height*size*3/8 - 5);
+						ctx.fillText('X' + InvSigns[0] + 5,X_shift+80+width*size + 5,70+height*size*4/16 + 5);
 							
-						ctx.moveTo(80+width*size,70+height*size*3/8);
-						ctx.lineTo(80+width*size,70+height*size*5/8 - 5);
-						ctx.fillText('X' + InvSigns[1] + 5,80+width*size + 5,70+height*size*8/16 + 5);
+						ctx.moveTo(X_shift+80+width*size,70+height*size*3/8);
+						ctx.lineTo(X_shift+80+width*size,70+height*size*5/8 - 5);
+						ctx.fillText('X' + InvSigns[1] + 5,X_shift+80+width*size + 5,70+height*size*8/16 + 5);
 							
-						ctx.moveTo(80+width*size,70+height*size*5/8);
-						ctx.lineTo(80+width*size,70+height*size*7/8 - 5);
-						ctx.fillText('X' + InvSigns[0] + 5,980+width*size + 5,70+height*size*12/16 + 5);
+						ctx.moveTo(X_shift+80+width*size,70+height*size*5/8);
+						ctx.lineTo(X_shift+80+width*size,70+height*size*7/8 - 5);
+						ctx.fillText('X' + InvSigns[0] + 5,X_shift+80+width*size + 5,70+height*size*12/16 + 5);
 						
-						ctx.moveTo(80+width*size,70+height*size*7/8);
-						ctx.lineTo(80+width*size,70+height*size*8/8 - 5);
-						ctx.fillText('X' + InvSigns[1] + 5,80+width*size + 5,70+height*size*15/16 + 5);
+						ctx.moveTo(X_shift+80+width*size,70+height*size*7/8);
+						ctx.lineTo(X_shift+80+width*size,70+height*size*8/8 - 5);
+						ctx.fillText('X' + InvSigns[1] + 5,X_shift+80+width*size + 5,70+height*size*15/16 + 5);
 							
 					case "5":
 						//x4
-						ctx.moveTo(40+width*size*0/8,	35);
-						ctx.lineTo(40+width*size*1/8 - 5,35);
-						ctx.fillText('X' + InvSigns[1] + 4,40+width*size*1/16 - 10,30);
+						ctx.moveTo(X_shift+40+width*size*0/8,	35);
+						ctx.lineTo(X_shift+40+width*size*1/8 - 5,35);
+						ctx.fillText('X' + InvSigns[1] + 4,X_shift+40+width*size*1/16 - 10,30);
 						
-						ctx.moveTo(40+width*size*1/8,	35);
-						ctx.lineTo(40+width*size*3/8 - 5,35);
-						ctx.fillText('X' + InvSigns[0] + 4,40+width*size*4/16 - 10,30);
+						ctx.moveTo(X_shift+40+width*size*1/8,	35);
+						ctx.lineTo(X_shift+40+width*size*3/8 - 5,35);
+						ctx.fillText('X' + InvSigns[0] + 4,X_shift+40+width*size*4/16 - 10,30);
 							
-						ctx.moveTo(40+width*size*3/8,	35);
-						ctx.lineTo(40+width*size*5/8 - 5,35);
-						ctx.fillText('X' + InvSigns[1] + 4,40+width*size*8/16 - 10,30);
+						ctx.moveTo(X_shift+40+width*size*3/8,	35);
+						ctx.lineTo(X_shift+40+width*size*5/8 - 5,35);
+						ctx.fillText('X' + InvSigns[1] + 4,X_shift+40+width*size*8/16 - 10,30);
 							
-						ctx.moveTo(40+width*size*5/8,	35);
-						ctx.lineTo(40+width*size*7/8 - 5,35);
-						ctx.fillText('X' + InvSigns[0] + 4,40+width*size*12/16 - 10,30);
+						ctx.moveTo(X_shift+40+width*size*5/8,	35);
+						ctx.lineTo(X_shift+40+width*size*7/8 - 5,35);
+						ctx.fillText('X' + InvSigns[0] + 4,X_shift+40+width*size*12/16 - 10,30);
 						
-						ctx.moveTo(40+width*size*7/8,	35);
-						ctx.lineTo(40+width*size*8/8 - 5,35);
-						ctx.fillText('X' + InvSigns[1] + 4,40+width*size*15/16 - 10,30);
+						ctx.moveTo(X_shift+40+width*size*7/8,	35);
+						ctx.lineTo(X_shift+40+width*size*8/8 - 5,35);
+						ctx.fillText('X' + InvSigns[1] + 4,X_shift+40+width*size*15/16 - 10,30);
 					
 					case "4":
 						//x3
-						ctx.moveTo(35,40+height*size*0/4 + (NumOfVars>4)*30);
-						ctx.lineTo(35,40+height*size*1/4 - 5 + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[1] + 3,5,40+height*size*1/8 + (NumOfVars>4)*30);
+						ctx.moveTo(X_shift+35,40+height*size*0/4 + (NumOfVars>4)*30);
+						ctx.lineTo(X_shift+35,40+height*size*1/4 - 5 + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[1] + 3,X_shift+5,40+height*size*1/8 + (NumOfVars>4)*30);
 							
-						ctx.moveTo(35,40+height*size*1/4 + (NumOfVars>4)*30);
-						ctx.lineTo(35,40+height*size*3/4 - 5 + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[0] + 3,5,40+height*size*4/8 + (NumOfVars>4)*30);
+						ctx.moveTo(X_shift+35,40+height*size*1/4 + (NumOfVars>4)*30);
+						ctx.lineTo(X_shift+35,40+height*size*3/4 - 5 + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[0] + 3,X_shift+5,40+height*size*4/8 + (NumOfVars>4)*30);
 						
-						ctx.moveTo(35,40+height*size*3/4 + (NumOfVars>4)*30);
-						ctx.lineTo(35,40+height*size*4/4 - 5 + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[1] + 3,5,40+height*size*7/8 + (NumOfVars>4)*30);
+						ctx.moveTo(X_shift+35,40+height*size*3/4 + (NumOfVars>4)*30);
+						ctx.lineTo(X_shift+35,40+height*size*4/4 - 5 + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[1] + 3,X_shift+5,40+height*size*7/8 + (NumOfVars>4)*30);
 						
 					case "3":
 						//x2
-						ctx.moveTo(40+width*size*0/4,	40+height*size + (NumOfVars>4)*30);
-						ctx.lineTo(40+width*size*1/4 - 5,40+height*size + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[1] + 2,40+width*size*1/8 - 10,40+height*size + 25 + (NumOfVars>4)*30);
+						ctx.moveTo(X_shift+40+width*size*0/4,	40+height*size + (NumOfVars>4)*30);
+						ctx.lineTo(X_shift+40+width*size*1/4 - 5,40+height*size + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[1] + 2,X_shift+40+width*size*1/8 - 10,40+height*size + 25 + (NumOfVars>4)*30);
 							
-						ctx.moveTo(40+width*size*1/4,	40+height*size + (NumOfVars>4)*30);
-						ctx.lineTo(40+width*size*3/4 - 5,40+height*size + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[0] + 2,40+width*size*4/8 - 10,40+height*size + 25 + (NumOfVars>4)*30);
+						ctx.moveTo(X_shift+40+width*size*1/4,	40+height*size + (NumOfVars>4)*30);
+						ctx.lineTo(X_shift+40+width*size*3/4 - 5,40+height*size + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[0] + 2,X_shift+40+width*size*4/8 - 10,40+height*size + 25 + (NumOfVars>4)*30);
 						
-						ctx.moveTo(40+width*size*3/4,	40+height*size + (NumOfVars>4)*30);
-						ctx.lineTo(40+width*size*4/4 - 5,40+height*size + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[1] + 2,40+width*size*7/8 - 10,40+height*size + 25 + (NumOfVars>4)*30);
+						ctx.moveTo(X_shift+40+width*size*3/4,	40+height*size + (NumOfVars>4)*30);
+						ctx.lineTo(X_shift+40+width*size*4/4 - 5,40+height*size + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[1] + 2,X_shift+40+width*size*7/8 - 10,40+height*size + 25 + (NumOfVars>4)*30);
 							
 					case "2":
 						//x1
-						ctx.moveTo(40+width*size,40+height*size*0/2 + (NumOfVars>4)*30);
-						ctx.lineTo(40+width*size,40+height*size*1/2 - 5 + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[0] + 1,50+width*size,40+height*size*1/4 + (NumOfVars>4)*30);
+						ctx.moveTo(X_shift+40+width*size,40+height*size*0/2 + (NumOfVars>4)*30);
+						ctx.lineTo(X_shift+40+width*size,40+height*size*1/2 - 5 + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[0] + 1,X_shift+50+width*size,40+height*size*1/4 + (NumOfVars>4)*30);
 							
-						ctx.moveTo(40+width*size,40+height*size*1/2 + (NumOfVars>4)*30);
-						ctx.lineTo(40+width*size,40+height*size*2/2 - 5 + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[1] + 1,50+width*size,40+height*size*3/4 + (NumOfVars>4)*30);
+						ctx.moveTo(X_shift+40+width*size,40+height*size*1/2 + (NumOfVars>4)*30);
+						ctx.lineTo(X_shift+40+width*size,40+height*size*2/2 - 5 + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[1] + 1,X_shift+50+width*size,40+height*size*3/4 + (NumOfVars>4)*30);
 						
 					case "1":
 						//x0
-						ctx.moveTo(40+width*size*0/2,35 + (NumOfVars>4)*30);
-						ctx.lineTo(40+width*size*1/2 -5,35 + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[0] + 0,40+width*size*1/4 - 10,30 + (NumOfVars>4)*30);
+						ctx.moveTo(X_shift+40+width*size*0/2,35 + (NumOfVars>4)*30);
+						ctx.lineTo(X_shift+40+width*size*1/2 -5,35 + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[0] + 0,X_shift+40+width*size*1/4 - 10,30 + (NumOfVars>4)*30);
 						
-						ctx.moveTo(40+width*size*1/2 + (NumOfVars>5)*5,35 + (NumOfVars>4)*30);
-						ctx.lineTo(40+width*size*2/2 - 5 + (NumOfVars>5)*5,35 + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[1] + 0,40+width*size*3/4  + (NumOfVars>5)*5 - 10,30 + (NumOfVars>4)*30);
+						ctx.moveTo(X_shift+40+width*size*1/2,35 + (NumOfVars>4)*30);
+						ctx.lineTo(X_shift+40+width*size*2/2 - 5,35 + (NumOfVars>4)*30);
+						ctx.fillText('X' + InvSigns[1] + 0,X_shift+40+width*size*3/4  + (NumOfVars>5)*5 - 10,30 + (NumOfVars>4)*30);
 				}
 				
 				ctx.stroke();
@@ -772,22 +778,13 @@
 				
 				ctx.globalAlpha = 0.7;
 				ctx.fillStyle = "rgb(192,192,192)";
-				function Cell(pos)
+				function Cell(pos)// 1,2 - 2; 3,4 - 1
 				{
-					ctx.fillRect(pos[0]*size + 40.5,pos[1]*size + 40.5 + (NumOfVars>4)*30, size-5, size-5);
+					ctx.fillRect(X_shift+pos[0]*size + 40.5,pos[1]*size + 40.5 + (NumOfVars>4)*30, size-5, size-5);
 				}
 
-				for(var i =0; i< Math.pow(2,NumOfVars);i++)
+				for(var i = 0; i < Math.pow(2,NumOfVars); i++)
 					Cell(poses[NumOfVars-1][i]);
-			}
-			
-			function onWindowResize()
-			{
-				windowHalfX = 200;
-				windowHalfY = 200;
-				camera.aspect = 1;
-				camera.updateProjectionMatrix();
-				renderer.setSize(350, 350);
 			}
  
 			function onDocumentMouseDown(event)

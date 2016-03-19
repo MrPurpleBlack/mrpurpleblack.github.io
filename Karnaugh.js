@@ -17,25 +17,48 @@ function calculate()
 				continue;
 			default:
 				alert("Таблица истинности заполнена неверными значениями!");//Ошибка - недопустимое значение
-				return "ДА ПОЧЕМУ НЕ РАБОТАЕТ?";
+				return 0;
 		}
     }
 	//Вывод исключительных выражений
-    if(groups.length == 0) return groups;
+    if(groups.length == 0) return [groups];
            
     for(var i = 1; i < Math.pow(2,NumOfVars); i <<= 1)//Объединение ячеек в группы
         groups = MakeGroups(groups,NumOfVars,i);
         
-    groups = groups.sort(function(a,b){return b.length - a.length})
+    groups = groups.sort(function(a,b){return b.length - a.length});
 	
+	var list_of_groups=[];
+	var canon_groups = groups.slice(0);
 	//Исключение повторяющихся и ненужных групп
-    for(var iter = 0; iter < NumOfVars + 2; iter++)
+	for(var i = 0; i < canon_groups.length; i++)
     {
-		groups = CheckGroups(groups);
-        var buf = groups.shift();
-        groups.push(buf);
-    }
-	return groups
+		var buf = canon_groups.shift();
+		canon_groups.push(buf);
+		for(var iter = 0; iter < NumOfVars + 2; iter++)
+		{
+			groups = CheckGroups(groups);
+			buf = groups.shift();
+			groups.push(buf);
+		}
+		list_of_groups.push(groups.sort());
+		groups = canon_groups;
+	}
+	list_of_groups = list_of_groups.filter(function(groups){return groups.length == list_of_groups.sort(function(a,b){return a.length - b.length})[0].length;});
+	//list_of_groups = list_of_groups.filter(function(a,b){return !a.IsEqual(b);});
+	
+	var new_list = [];
+	
+	for(i = 1; i < list_of_groups.length; i++)
+		if(!list_of_groups[i-1].IsEqual(list_of_groups[i]))
+			new_list.push(list_of_groups[i-1])
+	
+	new_list.push(list_of_groups[i-1]);
+	
+	console.log(new_list);
+	//console.log(list_of_groups[0].IsEqual(list_of_groups[1]));
+	//console.log([1,2].IsEqual(2));
+	return new_list;
 }
 
 function GenerateTruthTable(NumOfVars)
@@ -108,7 +131,29 @@ for(var i = 0; i < this.length; i++)
     if(this[i] == value) return true;
 return false;
 }
-        
+  
+Array.prototype.IsEqual = function(array)
+{
+	for(var i = 0; i < this.length; i++)
+	{
+		if(typeof this[i] == "object")
+		{
+			if(typeof array[i] == "object")
+			{
+				if(!this[i].IsEqual(array[i]))
+					return false;
+			}
+			else
+				return false;
+		}
+		else
+			if(array[i] != this[i])
+				return false;
+	}
+	return true;
+	
+}
+  
 function MakeGroups(groups,NumOfVars,leng)
 {
     var NewGroups = new Array();
@@ -136,8 +181,9 @@ function MakeGroups(groups,NumOfVars,leng)
         }
 		
 		if(PotentialGroups.length)
-			NewGroups = NewGroups.concat(PotentialGroups).sort(function(a,b){return a[0]&2});//Почему-то работает
-		else NewGroups.push(groups[group]);
+			NewGroups = NewGroups.concat(PotentialGroups)/*.sort(function(a,b){return a[0]&2})*/;//Почему-то работает
+		else 
+			NewGroups.push(groups[group]);
     }
     return NewGroups;
 } 
@@ -153,7 +199,7 @@ function CheckGroups(groups)
             if(!DescCells.ValueInArray(groups[group][cell]))
             {
                 DescCells = DescCells.concat(groups[group])
-                NewGroups.push(groups[group])
+                NewGroups.push(groups[group].sort())
                 break;
             }
         }
