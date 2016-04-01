@@ -35,10 +35,11 @@ h1
 {
 	font-family: Georgia;
 	font-size: 40px;	
-	padding-left: 50px;
 	padding-top: 30px;
+	padding-left: 50px;
 	color: #bdbdbd;
 	margin: 0;
+	display: inline;
 }
 footer
 {
@@ -50,7 +51,10 @@ footer
 }
 #logo
 {
-	display: block;
+	display: inline-block;
+	position: relative;
+	margin: 0;
+	padding: 0;
 	height: 80px;
 	width: 80px;
 	text-indent: -9999px;

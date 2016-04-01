@@ -35,7 +35,7 @@ function calculate()
     {
 		var buf = canon_groups.shift();
 		canon_groups.push(buf);
-		for(var iter = 0; iter < NumOfVars + 2; iter++)
+		for(var iter = 0; iter < NumOfVars+2; iter++)
 		{
 			groups = CheckGroups(groups);
 			buf = groups.shift();
