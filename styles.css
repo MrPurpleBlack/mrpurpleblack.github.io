@@ -1,280 +1,385 @@
 header
 {
-    background: #32383f;
-    height: 75px;
+    background: #454545;
+    height: 80px;
 }
 fieldset
 {
-    height:100%;
-    margin: 0 auto;
+    height: 100%;
+	margin: 0;
+	padding: 5px;
+	border: 1px solid rgba(69,69,69,.5);
 }
 body,textarea,input,select
 {
     font-family: Tahoma, Geneva, sans-serif;
-    font-size: 16;
+    font-size: 16px;
     color: #32383f;
     line-height: 18px;
     position: relative;
     margin: 0px;
-}
-h5
-{
-	font-family: Tahoma, Geneva, sans-serif;
-    font-size: 12;
-	font-weight:normal;
-	margin: 0;
-}
-span
-{
-	font-family: Tahoma, Geneva, sans-serif;
-    font-size: 12;
-	font-weight:normal;
-	margin: 0;
-}
-textarea
-{
-	overflow: auto;
 	resize: none;
-	background: #f6f6f6;
-	border: 1px solid #cecece;
 }
-select
+table
 {
-	display: block;
-	border: 1px solid #cecece;
-	background-color: #F6F6f6;
-	padding: 1px 1px 1px 3px;
-	color: #444;
-	height: 25px;
-	text-align:center;
-	width:150px;
-}
-input[type=button]
-{
-	margin-top: 5px;
-	margin-bottom: 10px;
-	background-color: #f6f6f6;
-	border: 1px solid #cecece;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
-    font-size: 14px;
-    text-align:center;
-	width: 150px;
-    height: 25px;
-}
-
-label {
-    display: inline-block;
-    cursor: pointer;
-    position: relative;
-    padding-left: 25px;
-    margin-right: 15px;
-    font-size: 13px;
-}
-input[type=radio] {
-    display: none;
-}
-label:before {
-    content: "";
-    display: inline-block;
- 
-    width: 14px;
-    height: 14px;
- 
-    margin-right: 10px;
-    position: absolute;
-    left: 0;
-    bottom: 1px;
-    background-color: #c0c0c0;
-}
-.radio label:before {
-    border-radius: 7px;
-}
-input[type=radio]:checked + label:before {
-    content: "\2022";
-    color: #f6f6f6;
-    font-size: 18px;
-    text-align: center;
-    line-height: 13px;
-}
-
-input[type=checkbox] {
-    display: none;
-}
-.group label:before {
-    content: "";
-    display: inline-block;
- 
-    width: 16px;
-    height: 16px;
- 
-    margin-right: 10px;
-    position: absolute;
-    left: 0;
-    bottom: 1px;
-    background-color: #c0c0c0;
-}
-.group label:before {
-    border-radius: 8px;
-}
-input[type=checkbox]:checked + label:before {
-    content: "\2713";
-    color: #f6f6f6;
-    font-size: 16px;
-    text-align: center;
-    line-height: 15px;
-}
-
-input[type=button]:hover, input[type=button]:focus
-{
-   border-color: rgba(82, 168, 236, 0.8);
-   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6);
-   outline: 0 none;
-}
-select:hover, select:focus
-{
-   border-color: rgba(82, 168, 236, 0.8);
-   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6);
-   outline: 0 none;
-}
-
-input[type=range]
-{
-	width: 90%;
-	-webkit-appearance:none;
-	margin: 9px 0;
-}
-input[type=range]::-webkit-slider-runnable-track
-{
+	border-spacing: 0;
 	width: 100%;
-	height: 7px;
-	cursor: pointer;
-	background: #c0c0c0;
-	color: #f6f6f6;
-	border-radius: 0px;
-	background-color: #f6f6f6;
-	border: 1px solid #cecece;
-
+	margin: 0;
+	padding: 0;
 }
-input[type=range]::-webkit-slider-thumb
+input[type=radio]
 {
-	border: 1px solid #a0a0a0;
-	height: 22px;
-	width: 6px;
-	border-radius: 0px;
-	background: white;
-	cursor: pointer;
-	-webkit-appearance: none;
-	margin-top: -8.5px;
+	display: none;
 }
-
-#TT
+h1
 {
-    float: left;
-    font-size: 20px;
-	line-height: 10px;
-}
-#exp
-{
-	top: 12px;
-    line-height: 15px;
-    font-size: 15;    
-    width: 15px;
-    height: 245px;
-    float: left;
-	overflow: hidden;
-}
-#TruthTable
-{
-    width: 58px;
-    line-height: 15px;
-    font-size: 16px;
-    height: 250px;
-    border: none;
-    resize: none;
-    float: left;
-	background: #fff;
-	overflow: hidden;
-}
-.data
-{
-    float: right;
-	margin: auto;
-}
-#ret
-{
-    width: 100%;
-    height: 93%;
-}
-#interface
-{
-    top: 100px;
-    width: 1000px;
-    height: 90%;
-    margin: 0 auto;
-}
-#input
-{
-    width: 374px;
-    height: 660px;
-    float: left;
-    margin: 5px;
-}
-#karnaugh
-{
-    height: 660px;
-    width: 606px;
-    float: left;
-    margin: 5px;
-	margin-right: 0px;
-}
-#output
-{
-    width: 990px;
-	height: auto;
-    float: left;
-    margin: 5px;
-    margin-top:15px;
-	margin-bottom: 40px;
-}
-#author
-{
-	display: block;
-	font-family: comic sans;
-    width: 370px;
-    height: 30px;
-	margin-bottom:20px;
-	margin: auto;
-}
-#container
-{
-	float:left;
-	position: relative;
+	font-family: Georgia;
+	font-size: 40px;	
+	padding-left: 50px;
+	padding-top: 30px;
+	color: #bdbdbd;
 	margin: 0;
 }
-
-#KarnaughSetings
+footer
 {
+	color: #696969;
+	font-weight: 600;
+	font-size: 14px;
+	margin: 10px auto;
 	text-align: center;
-	float: right;
-	width: 175px;
+}
+#logo
+{
+	display: block;
+	height: 80px;
+	width: 80px;
+	text-indent: -9999px;
+    background: url('logo.png') top left no-repeat;
+}
+
+
+
+
+.interface
+{
+	position: relative;
+	margin: 0 auto;
+	width: 1040px;
 	height: 100%;
-	margin: 0;
 }
-#group
-{
-	font-size: 12px;
-	text-align: left;
-	margin:0;
-}
-#OutputData
-{
-	width: 100%;
-	height: 100%;
-	margin: 0;
-}
-#VarRow
-{
-	background: #CECECE;
-	margin:10px;
-	padding: 10px;
-}
+
+/*Блок ввода данных*/
+	.input
+	{
+		float: left;
+		width: 100%;
+		height: 100%;
+		margin: 0px;
+		padding: 0;
+	}
+	.InputTD
+	{
+		vertical-align: top;
+		padding: 3px;
+		margin: 0;
+		height: 100%;
+	}
+	.col
+	{
+		float: left;
+		height: 100%;
+		margin: 0;
+		width: 100%;
+	}
+	
+	.radio
+	{
+		margin: 20px 0 20px 0;
+	}
+	
+	/*Радиокнопки*/
+		.radio label
+		{
+			display: inline-block;
+			cursor: pointer;
+			position: relative;
+			font-size: 13px;
+		}
+		.radio label:checked
+		{
+			background: #454545;
+		}
+		.radio label:before
+		{
+			content: "";
+			display: inline-block;
+			width: 14px;
+			height: 14px;
+			float: left;
+			background-color: #c0c0c0;
+			box-shadow: inset 0px 2px 2px 0px rgba(0,0,0,.3), 0px 1px 1px 0px rgba(255,255,255,.8);
+			border-radius: 8px;
+			margin: 2px;
+		}
+		.radio input[type=radio]:checked + label:before
+		{
+			font-weight: 600;
+			content: "\2022";
+			color: #f6f6f6;
+			font-size: 12px;
+			text-align: center;
+			line-height: 12px;
+		}
+	
+	#Variables
+	{
+		letter-spacing: 0px;
+		font-size: 16px;
+		margin: 0;
+	}
+	
+	#TruthTable
+	{
+		width: 66px;
+		line-height: 19px;
+		font-size: 19px;
+		height: 810px;
+		border: none;
+		resize: none;
+		float: left;
+		background: #fff;
+		overflow: hidden;
+		letter-spacing: 6px;
+		padding-right: 0;
+	}
+	#exp
+	{
+		width: 13px;
+		height: 306px;
+		line-height: 19px;
+		resize: none;
+		margin: 0;
+		background: #f8f8f8;
+		border-color: #bdbdbd;
+		font-size: 19px;
+		padding: 1px;
+		overflow: hidden;
+		padding: 1px 0 0 3px;
+	}
+
+	select
+	{
+		display: block;
+		border: 1px solid #cecece;
+		background-color: #F6F6f6;
+		padding: 1px 1px 1px 3px;
+		color: #444;
+		height: 25px;
+		text-align:center;
+		width: 80%;
+	}
+	select:hover, select:focus
+	{
+	   border-color: rgba(82, 168, 236, 0.8);
+	   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6);
+	   outline: 0 none;
+	}
+	
+	input[type=button]
+	{
+		margin-top: 5px;
+		margin-bottom: 10px;
+		background-color: #f6f6f6;
+		border: 1px solid #cecece;
+		box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+		font-size: 14px;
+		text-align:center;
+		width: 80%;
+		height: 25px;
+	}
+	input[type=button]:hover, input[type=button]:focus
+	{
+	   border-color: rgba(82, 168, 236, 0.8);
+	   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6);
+	   outline: 0 none;
+	}
+	
+	
+
+
+/*Блок визуализации моделей*/
+	.karnaugh
+	{
+		float: left;
+		width: 100%;
+		height: 100%;
+		margin: 0px;
+		padding: 0;
+	}
+
+	#container
+	{
+		position: relative;
+		margin: 0 auto;
+		width: 420px;
+		height: 420px;
+
+	}
+	#KarnaughSetings
+	{
+		text-align: left;
+		float: left;
+		width: 100%;
+		height: 100%;
+		margin: 0;
+	}
+
+
+	.group
+	{
+		font-size: 16px;
+		text-align: left;
+		margin:0;
+	}
+	/*Чекбоксы*/
+		input[type=checkbox]
+		{
+			display: none;
+		}
+		.group label:before
+		{
+			content: "";
+			display: inline-block;
+			cursor: pointer;
+			font-weight: 600;
+			float: left;
+			width: 16px;
+			height: 16px;
+			margin-right: 5px;
+			background-color: #c0c0c0;
+		}
+		.group label
+		{
+			cursor: pointer;
+		}
+		.group input[type=checkbox]:checked + label:before
+		{
+			content: "\2713";	
+			color: #f6f6f6;
+			font-size: 16px;
+			text-align: center;
+		}
+
+	
+	/*Ползунки*/
+		input[type=range]
+		{
+			width: 90%;
+			-webkit-appearance:none;
+			margin: 9px 0;
+		}
+		input[type=range]::-webkit-slider-runnable-track
+		{
+			width: 100%;
+			height: 7px;
+			cursor: pointer;
+			background: #c0c0c0;
+			color: #f6f6f6;
+			border-radius: 0px;
+			background-color: #f6f6f6;
+			border: 1px solid #cecece;
+
+		}
+		input[type=range]::-webkit-slider-thumb
+		{
+			border: 1px solid #a0a0a0;
+			height: 22px;
+			width: 6px;
+			border-radius: 0px;
+			background: white;
+			cursor: pointer;
+			-webkit-appearance: none;
+			margin-top: -8.5px;
+		}
+		input[type=range]::-moz-range-track
+		{
+			width: 100%;
+			height: 7px;
+			cursor: pointer;
+			background: #c0c0c0;
+			color: #f6f6f6;
+			border-radius: 0px;
+			background-color: #f6f6f6;
+			border: 1px solid #cecece;
+
+		}
+		input[type=range]::-moz-range-thumb
+		{
+			border: 1px solid #a0a0a0;
+			height: 22px;
+			width: 6px;
+			border-radius: 0px;
+			background: white;
+			cursor: pointer;
+			-webkit-appearance: none;
+			margin-top: -8.5px;
+		}
+		
+
+/*Блок вывода данных*/
+	.output
+	{
+		float: left;
+		width: 100%;
+		height: 100%;
+		margin: -5px 0;
+		padding: 0;
+	}
+	.exps
+	{
+		width: 100%;
+		height: 100%;
+		font-family: Tahoma, Geneva, sans-serif;
+	}
+	
+	/*радиокнопки*/
+		.exps label
+		{
+			display: inline-block;
+			cursor: pointer;
+			position: relative;
+			font-size: 20px;
+			background: #f8f8f8;
+			padding: 10px;
+			margin: 10px;
+			width: 96%;
+			font-weight: 500;
+			color: black;
+			line-height: 25px;
+			border: 1px solid rgba(69,69,69,.7);
+		}
+
+		.exps label:before
+		{
+			content: "";
+			display: block;
+			width: 20px;
+			height: 20px;
+			float: left;
+			background-color: #f8f8f8;
+			margin: 0 20px 0 0;
+		}
+		.exps input[type=radio]:checked + label:before
+		{
+			font-weight: 600;
+			content: "\2022";
+			color: #222222;
+			font-size: 36px;
+			text-align: center;
+			line-height: 20px;
+			background: #bdbdbd;
+		}
+		.exps input[type=radio]:checked + label
+		{
+			background: #bdbdbd;
+		}

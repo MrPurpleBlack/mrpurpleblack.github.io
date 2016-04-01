@@ -2,7 +2,7 @@ var out_br;
 
 function calculate()
 {
-    var NumOfVars = document.DataInput.NumOfVars.value;//Количество переменных
+    var NumOfVars = document.DataInput.NumOfVars.value-0;//Количество переменных
     var ExpressionValue = document.DataInput.MM.value;//Значение мднф или мкнф
 	var exp = document.DataInput.exp.value;//Выражение таблицы истинности
     var groups = new Array();
@@ -25,9 +25,9 @@ function calculate()
            
     for(var i = 1; i < Math.pow(2,NumOfVars); i <<= 1)//Объединение ячеек в группы
         groups = MakeGroups(groups,NumOfVars,i);
-        
-    groups = groups.sort(function(a,b){return b.length - a.length});
-	
+		
+	groups.sort();
+        	
 	var list_of_groups=[];
 	var canon_groups = groups.slice(0);
 	//Исключение повторяющихся и ненужных групп
@@ -44,21 +44,21 @@ function calculate()
 		list_of_groups.push(groups.sort());
 		groups = canon_groups;
 	}
-	list_of_groups = list_of_groups.filter(function(groups){return groups.length == list_of_groups.sort(function(a,b){return a.length - b.length})[0].length;});
-	//list_of_groups = list_of_groups.filter(function(a,b){return !a.IsEqual(b);});
 	
-	var new_list = [];
+	canon_groups = null;
 	
+	list_of_groups.sort(function(a,b){return a.length - b.length});
+	
+	list_of_groups = list_of_groups.filter(function(groups){return groups.length == list_of_groups[0].length;});
+	
+	list_of_groups.sort();
+	list_of_groups.sort(function(a,b){return a.length - b.length});
+	groups = list_of_groups.slice(0,1); 
 	for(i = 1; i < list_of_groups.length; i++)
-		if(!list_of_groups[i-1].IsEqual(list_of_groups[i]))
-			new_list.push(list_of_groups[i-1])
-	
-	new_list.push(list_of_groups[i-1]);
-	
-	console.log(new_list);
-	//console.log(list_of_groups[0].IsEqual(list_of_groups[1]));
-	//console.log([1,2].IsEqual(2));
-	return new_list;
+		if(list_of_groups[i].toString() != groups[0].toString())
+				groups.unshift(list_of_groups[i])
+
+	return groups.sort();
 }
 
 function GenerateTruthTable(NumOfVars)
@@ -67,18 +67,18 @@ function GenerateTruthTable(NumOfVars)
     var TT = new Array();
     for(var i=0;i<NumOfVars;i++)
 	{
-		TT[i]='0 ';
+		TT[i]='0';
 		Vars+='X<sub>'+i+'</sub>';
 	}
-	document.getElementById("Vars").innerHTML = Vars;
+	document.getElementById("Variables").innerHTML = Vars;
     var fin = TT.join('');
     for(var row=0; row<Math.pow(2,NumOfVars)-1;row++)
     {
         for(var col=NumOfVars-1;col>=0;col--)
         {
-            while(TT[col] == '1 ')
-                TT[col--] = '0 ';
-            TT[col] = '1 ';
+            while(TT[col] == '1')
+                TT[col--] = '0';
+            TT[col] = '1';
             break;
         }
         fin+=TT.join('');
@@ -93,16 +93,17 @@ function ValNumChange(NumOfVars)
 	
     Data.exp.maxLength = BinPow;
     Data.exp.value = '';
-    Data.TruthTable.style.width = 14*NumOfVars + 2 + 'px';
+    Data.TruthTable.style.width = 16.5*NumOfVars + 'px';
     Data.TruthTable.value = GenerateTruthTable(NumOfVars);
 	
-    var x= 15*BinPow + 5;
-    Data.exp.style.height = x + 'px';
-    Data.TruthTable.style.height = x + 'px';
-	
-    if(NumOfVars < 6) x=590;
-	document.getElementById("input").style.height = x + 70 + 'px';
-    document.getElementById("karnaugh").style.height = x + 70 + 'px';
+    var x= 19*BinPow;
+    Data.exp.style.height = x + 2 + 'px';
+    Data.TruthTable.style.height = '810px';
+	if(NumOfVars>5)
+	{
+		Data.TruthTable.style.height = x + 'px';
+		document.getElementById("group").style.height = x-49 + 'px';
+	}
 }
         
 Array.prototype.ArrayInArray = function(array)
@@ -127,9 +128,9 @@ Array.prototype.ArrayInArray = function(array)
         
 Array.prototype.ValueInArray = function(value)
 {
-for(var i = 0; i < this.length; i++)
-    if(this[i] == value) return true;
-return false;
+	for(var i = 0; i < this.length; i++)
+		if(this[i] == value) return true;
+	return false;
 }
   
 Array.prototype.IsEqual = function(array)
@@ -153,6 +154,20 @@ Array.prototype.IsEqual = function(array)
 	return true;
 	
 }
+
+Array.prototype.toString = function()
+{
+	var str = "";
+	for(var i = 0; i < this.length; i++)
+	{
+		if(typeof this[i] == "object")
+			str += this[i].toString();
+		else
+			str += this[i];
+	}
+	return str;
+	
+}
   
 function MakeGroups(groups,NumOfVars,leng)
 {
@@ -162,7 +177,7 @@ function MakeGroups(groups,NumOfVars,leng)
         var PotentialGroups = new Array();
         if(groups[group].length==leng)
         {
-            for(var BinPow = Math.pow(2,NumOfVars-1); BinPow>=1; BinPow/=2)
+            for(var BinPow = 1; BinPow<=Math.pow(2,NumOfVars-1); BinPow*=2)
             {   
                 var PotNeibGroup = groups[group].slice(0);//Создание потенциальной соседней группы
                 for(var i=0;i<PotNeibGroup.length;i++)
@@ -183,7 +198,7 @@ function MakeGroups(groups,NumOfVars,leng)
 		if(PotentialGroups.length)
 			NewGroups = NewGroups.concat(PotentialGroups)/*.sort(function(a,b){return a[0]&2})*/;//Почему-то работает
 		else 
-			NewGroups.push(groups[group]);
+			NewGroups.push(groups[group].sort());
     }
     return NewGroups;
 } 
@@ -192,6 +207,7 @@ function CheckGroups(groups)
 {
     var DescCells = new Array();
     var NewGroups = new Array();
+	//console.log(groups);
     for(var group = 0;group < groups.length; group++)
     {
         for(var cell = 0; cell<groups[group].length; cell++)

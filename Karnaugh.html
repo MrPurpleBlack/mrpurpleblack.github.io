@@ -1,109 +1,145 @@
-﻿<html>
-    <head>
-        <title>Визуализация карт Карно</title>
-        <meta content="text/html; charset=utf-8" />
-        <link rel="stylesheet" type="text/css" href="styles.css"/>
-        <header align="center"></header>
-    </head>
-    <body>
-        <div id="interface">
-            <div id="input">
-                <fieldset>
-                    <legend>Ввод данных</legend>
-                    <form name="DataInput">
-						<div id="TT">
-							<span id="Vars">X<sub>0</sub>X<sub>1</sub>X<sub>2</sub>X<sub>3</sub></span>
-						<div>
-						</div>
-							<textarea type="text" name="TruthTable" id="TruthTable" readonly="true">0 0 0 0 0 0 0 1 0 0 1 0 0 0 1 1 0 1 0 0 0 1 0 1 0 1 1 0 0 1 1 1 1 0 0 0 1 0 0 1 1 0 1 0 1 0 1 1 1 1 0 0 1 1 0 1 1 1 1 0 1 1 1 1</textarea>
-                        </div>
-						<textarea type="text" name="exp" id="exp" maxLength="16" autofocus onInput="if(/[^0-1 .]/i.test(this.value)){this.value=this.value.substr(0,this.value.length-1);}"></textarea>
-                        <div class="data">
-                            <b>Количество переменных</b><br>
-                            <select name="NumOfVars" onchange="ValNumChange(document.DataInput.NumOfVars.value); ReloadKC();">
-                                <option value="1" > 1 переменная </option> 
-                                <option value="2" > 2 переменные </option>
-                                <option value="3" > 3 переменные </option> 
-                                <option value="4" selected> 4 переменные </option> 
-                                <option value="5" > 5 переменных </option>
-                                <option value="6" > 6 переменных </option>
-                            </select>
-							<div class="radio">
-								<p>
-								<b>Метод минимизации</b><br>
-								<input id="MDNF" name="MM" type="radio" value="1" checked>
-								<label for="MDNF">МДНФ</label><br>
-								<input id="MKNF" name="MM" type="radio" value="0">
-								<label for="MKNF">МКНФ</label><br>
-								</p>
-							</div>
-                            <input type="button" value="Вычислить" onclick="KAL();">
-							
-							<p>
-							<b>Случайный пример</b><br>
-							<input type="button" value="Показать пример" onclick="
-							var exp = examples[Math.round((Math.random()*16))%16];
-							
-							if(document.DataInput.NumOfVars.value != '6')
-							{
-								document.DataInput.NumOfVars.value = '6';
-								ValNumChange('6'); 
-								ReloadKC();
-							}
-							
-							document.DataInput.exp.value = exp;
-							KAL();
-							">
-							</p>
-							<details>
-								<summary><span>Внимание! BETA</span></summary>
-								<h5>При обнаружении ошибок вывода или </h5>
-								<h5>артефактов отображения, пожалуйста,</h5>
-								<h5>отправьте краткий репорт по адресу</h5>
-								<h5>mrpurpleblack@gmail.com</h5>
-							</details>
-							
-							
-                        </div>
-                    </form>    
-                </fieldset>        
-            </div>
-            
-            <div id="karnaugh">
-                <fieldset>
-                    <legend>Карта Карно</legend>
-					<div id="container"></div>
-					<form name="KarnaughSets">
-						<div id = "KarnaughSetings">
-							Прозрачность полукарт
-							<input type="range" name="PlaneOpacity" min="0" max="1" step="0.01" value="0.7" onInput="ChangePLanes(document.KarnaughSets.PlaneOpacity.value);">
-							Прозрачность пустых ячеек
-							<input type="range" name="EmptyCellOpacity" min="0" max="0.7" step="0.01" value="0.7" onInput="ChangeCells(document.KarnaughSets.EmptyCellOpacity.value);">
-							<div id="group" ></div>
-						</div>
-						
-					</form>
-					<canvas id="2DimKC" height="460px" width="400px" margin="0" ></canvas>
-				</fieldset>
-            </div>
-            
-            <div id="output">    
-                <fieldset>
-                    <legend>Вывод</legend>
-					<div id="OutputData">
-					</div>
-                    </form> 
-                </fieldset>
-            </div>
-        </div>
-		<div id="author"><h4>2015, Визуализация карт Карно</h4></div> 
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<title>Визуализация карт Карно</title>
+		<meta content="text/html; charset=utf-8" />
+		<link rel="stylesheet" type="text/css" href="styles.css"/>
 		
-        <script src="Karnaugh.js"></script>
+	</head>
+	<body>
+		
+		<header align="left">
+			<a id="logo">Визуализация карт Карно</a>
+			<h1>Визуальная модель КК</h1>
+		</header>
+	
+		<div class="interface">
+			<table>
+				<tr>
+				
+					<td class="InputTD" width="360px" height="100%">
+						<fieldset height="100%">
+							<legend>Ввод данных</legend>
+							<div class="input">
+							
+								<form name="DataInput">
+								<table>
+									<tr>
+									
+										<td class="InputTD" width="120px">
+											<div class="col" id="Lcol" >
+												<div style="margin:0; float: left; width:100%;">
+													<label id="Variables">X<sub>0</sub>X<sub>1</sub>X<sub>2</sub>X<sub>3</sub></label>
+												</div>
+												<textarea type="text" name="TruthTable" id="TruthTable" readonly="true">0000000100100011010001010110011110001001101010111100110111101111</textarea>
+												<textarea type="text" name="exp" id="exp" maxLength="16" autofocus onInput="if(/[^0-1 .]/i.test(this.value)){this.value=this.value.substr(0,this.value.length-1);}"></textarea>
+											</div>
+										</td>
+										
+										<td class="InputTD">
+											<div class="col" style="float: right">
+												<b>Количество переменных</b><br>
+												<select name="NumOfVars" onchange="ValNumChange(document.DataInput.NumOfVars.value); ReloadKC();">
+													<option value="1" > 1 переменная </option> 
+													<option value="2" > 2 переменные </option>
+													<option value="3" > 3 переменные </option> 
+													<option value="4" selected> 4 переменные </option> 
+													<option value="5" > 5 переменных </option>
+													<option value="6" > 6 переменных </option>
+												</select>
+												
+												<div class="radio">
+													<b>Метод минимизации</b><br>
+													<input id="MDNF" name="MM" type="radio" value="1" checked>
+													<label for="MDNF">МДНФ</label>
+													<input id="MKNF" name="MM" type="radio" value="0">
+													<label for="MKNF">МКНФ</label>
+												</div>
+													
+												<input type="button" value="Вычислить" onclick="KAL();">
+												
+												<p>
+												<b>Случайный пример</b><br>
+												<input type="button" value="Показать пример" onclick="
+													var exp = examples[Math.round((Math.random()*16))%16];
+													
+													if(document.DataInput.NumOfVars.value != '6')
+													{
+														document.DataInput.NumOfVars.value = '6';
+														ValNumChange('6'); 
+														ReloadKC();
+													}
+													
+													document.DataInput.exp.value = exp;
+													KAL();
+												">
+												</p>
+												<!--<details>
+													<summary><span>Внимание! BETA</span></summary>
+														При обнаружении ошибок вывода или артефактов отображения, пожалуйста, отправьте краткий репорт по адресу: mrpurpleblack@gmail.com
+												</details>-->
+											</div>
+										</td>
+										
+									</tr>
+								</form>	
+								</table>
+							</div>	
+						</fieldset>		
+					</td>
+					
+					<td class="InputTD">
+						<fieldset>
+							<legend>Карта Карно</legend>
+							<div class="karnaugh">
+								<table>
+									<tr>
+									
+										<td class="InputTD" style="padding:0">
+											<div id="container"></div>
+											<canvas id="2DimKC" width="420px" height="420px"></canvas>
+										</td>
+										
+										<td class="InputTD" style="padding:0; width:240px;">
+											<form name="KarnaughSets">
+												<div id="Rcol" >
+													<b>Прозрачность полукарт</b>
+													<input type="range" name="PlaneOpacity" min="0" max="1" step="0.01" value="0.7" onInput="ChangePLanes(document.KarnaughSets.PlaneOpacity.value);">
+													<b>Прозрачность пустых ячеек</b>
+													<input type="range" name="EmptyCellOpacity" min="0" max="0.7" step="0.01" value="0.7" onInput="ChangeCells(document.KarnaughSets.EmptyCellOpacity.value);">
+													<div class="group" id="group" >
+													</div>
+												</div>
+												
+											</form>
+										</td>
+									
+									</tr>
+								</table>
+							</div>
+						</fieldset>
+					</td>
+				</tr>
+				
+				<tr>
+					<td colspan="2" style="padding-top: 0;" class="InputTD">
+						<div class="output">	
+							<fieldset>
+								<legend>Вывод</legend>
+								<div id="exps" class="exps">
+								</div> 
+							</fieldset>
+						</div>
+					</td>
+			</table> 
+		</div>
+		<footer>Максимка 2016</footer>
+		
+		<script src="Karnaugh.js"></script>
 		<script src="three/three.min.js"></script>
 		<script src="three/Projector.js"></script>
 		<script src="three/Detector.js"></script>
 		<script src="three/CanvasRenderer.js"></script>
-		
 		<script src="three/TextGeometry.js"></script>
 		<script src="three/FontUtils.js"></script>
 		<script src="three/gentilis_regular.typeface.js"></script>
@@ -126,14 +162,13 @@
 			var mouseY = 0;
 			var mouseYOnMouseDown = 0;
 			
-			var windowHalfX = 100;
-			var windowHalfY = 100;
+			var windowHalfX = 125;
+			var windowHalfY = 125;
 			
 			var NumOfVars = document.DataInput.NumOfVars.value;
 			var BinPow = Math.pow(2,NumOfVars);
 			var size = 20;
-			var gap = 4;
-			var gap_plus_size = size + gap;
+			var gap_plus_size = size + 4;
 			
 			var PlaneOpacity = 0.7;
 			var GROUPS = [];
@@ -152,7 +187,6 @@
 				[0,0],[0,1],[1,0],[1,1],[0,3],[0,2],[1,3],[1,2],[3,0],[3,1],[2,0],[2,1],[3,3],[3,2],[2,3],[2,2]]
 			];
 
-			var X_shift = 160-45*Math.ceil(NumOfVars/2)-15*(NumOfVars==6);
 			var groupCubes = new THREE.Group();
 			var groupPlanes = new THREE.Group();
 			
@@ -169,21 +203,20 @@
 				alert("Внимание, ваш браузер не поддерживает WebGLRenderer. В связи с этим могут возникнуть проблемы с производительностью. Для беспрепядственного использования данного ресурса смените браузер.");
 			
 			var examples = ['0000000001000000000000000100000000000000010000000000000001000000','0000000000000011000000000000001100000000000000110000000000000011','0001000000000000000100000000000000010000000000000001000000000000','0001000100010001000100010001000100010001000100010001000100010001','0001000000000001000100000000000100010000000000010001000000000001','0000000000000110000000000000011000000000000001100000000000000110','0001000000000110000100000000011000010000000001100001000000000110','0001001001000000000100100100000000010010010000000001001001000000','0001001101010000000100110101000000010011010100000001001101010000','0000000000000111000000000000011100000000000001110000000000000111','0000001001000000000000100100000000000010010000000000001001000000','0000000100010000000000010001000000000001000100000000000100010000','0000000100010110000000010001011000000001000101100000000100010110','0000000100010001000000010001000100000001000100010000000100010001','1001000000001001100100000000100110010000000010011001000000001001','1001001001000001100100100100000110010010010000011001001001000001'];
-
+			
 			init();
 			animate();
 			
+			
 			//Инициализация рабочей области
 			function init()
-			{
-				X_shift = 160-45*Math.ceil(NumOfVars/2)-15*(NumOfVars==6);
-				
+			{	
 				//Инициализация контейнера
 				container = document.getElementById('container');
 				
 				//Камера
 				camera = new THREE.PerspectiveCamera( 70, 1, 1, 1000 );
-				camera.position.z = 100 + 20*(NumOfVars);
+				camera.position.z = 60 + 20*(NumOfVars);
 				
 				//Создание сцены
 				scene = new THREE.Scene();
@@ -199,9 +232,7 @@
 				scene.add(groupPlanes);
 				
 				//Создание двухмерной модели КК
-				canvas = document.getElementById("2DimKC");
-				ctx = canvas.getContext("2d");
-				ctx.clearRect(0,0,400,400);
+				ctx.clearRect(0,0,420,420);
 				drawKarnaughcard(NumOfVars);
 				drawHalfCards(NumOfVars);
 				
@@ -215,7 +246,7 @@
 					renderer = new THREE.CanvasRenderer();
 					
 				renderer.setClearColor(0xffffff);
-				renderer.setSize(400, 400);
+				renderer.setSize(420, 420);
 				renderer.render(scene,camera);
 				container.appendChild(renderer.domElement);
 			
@@ -223,83 +254,88 @@
 				container.addEventListener('mousedown', onDocumentMouseDown, false);
 				container.addEventListener('touchstart', onDocumentTouchStart, false);
 				container.addEventListener('touchmove', onDocumentTouchMove, false);
-
-				//console.log(scene)
 			}
 					
 			//Визуализация групп ячеек 
-			function Group()//3 4 5 6
+			function Group(id)//3 4 5 6
 			{
-				ctx.font = '30px sans-serif';
+				var size = (4-Math.ceil(NumOfVars/2))*36;// 1,2: 120, 3,4: 80, 5,6: 40	
+				var width = Math.pow(2,Math.ceil(NumOfVars/2));
+				var height = Math.pow(2,Math.floor(NumOfVars/2));
+				var gap = (4-Math.ceil(NumOfVars/2))*5;
 				
-				var size = 45;
-				if(NumOfVars > 4)
+				
+				ctx.font = size/2+'px sans-serif';	
+				document.getElementById('group').innerHTML += '<p><input type="checkbox" name="groupAll" id="groupAll" value="All" onchange="onAllGroupsChange(id)" checked><label for="groupAll">Все группы</label><br></p>';
+				for(var group = 0; group < GROUPS[id].length; group++)
 				{
-					size = 35;
-					ctx.font = '20px sans-serif';
-				}
-					
-				document.getElementById('group').innerHTML += '<p><input type="checkbox" name="groupAll" id="groupAll" value="All" onchange="onAllGroupsChange()" checked><label for="groupAll">Все группы</label><br></p>';
-				for(var group = 0; group < GROUPS.length; group++)
-				{
-					for(var cell = 0; cell < GROUPS[group].length; cell++)
+					for(var cell = 0; cell < GROUPS[id][group].length; cell++)
 					{
-						var RectX = X_shift+poses[NumOfVars-1][GROUPS[group][cell]][0]*size;
-						var RectY = poses[NumOfVars-1][GROUPS[group][cell]][1]*size;
+						var RectX = 210-(width/2 - poses[NumOfVars-1][GROUPS[id][group][cell]][0])*size+gap/2;
+						var RectY = 210-(height/2 - poses[NumOfVars-1][GROUPS[id][group][cell]][1])*size+gap/2;
 						
-						groupCubes.children[GROUPS[group][cell]].material.color.r *= group_colors[GROUPS[group][cell]];
-						groupCubes.children[GROUPS[group][cell]].material.color.g *= group_colors[GROUPS[group][cell]];
-						groupCubes.children[GROUPS[group][cell]].material.color.b *= group_colors[GROUPS[group][cell]];
+						groupCubes.children[GROUPS[id][group][cell]].material.color.r *= group_colors[GROUPS[id][group][cell]];
+						groupCubes.children[GROUPS[id][group][cell]].material.color.g *= group_colors[GROUPS[id][group][cell]];
+						groupCubes.children[GROUPS[id][group][cell]].material.color.b *= group_colors[GROUPS[id][group][cell]];
 						
-						group_colors[GROUPS[group][cell]]++;
+						group_colors[GROUPS[id][group][cell]]++;
 						
-						groupCubes.children[GROUPS[group][cell]].material.color.r += colors[group%16][0];
-						groupCubes.children[GROUPS[group][cell]].material.color.r /= group_colors[GROUPS[group][cell]];
+						groupCubes.children[GROUPS[id][group][cell]].material.color.r += colors[group%16][0];
+						groupCubes.children[GROUPS[id][group][cell]].material.color.r /= group_colors[GROUPS[id][group][cell]];
 							
-						groupCubes.children[GROUPS[group][cell]].material.color.g += colors[group%16][1];
-						groupCubes.children[GROUPS[group][cell]].material.color.g /= group_colors[GROUPS[group][cell]];
+						groupCubes.children[GROUPS[id][group][cell]].material.color.g += colors[group%16][1];
+						groupCubes.children[GROUPS[id][group][cell]].material.color.g /= group_colors[GROUPS[id][group][cell]];
 						
-						groupCubes.children[GROUPS[group][cell]].material.color.b += colors[group%16][2];
-						groupCubes.children[GROUPS[group][cell]].material.color.b /= group_colors[GROUPS[group][cell]];
+						groupCubes.children[GROUPS[id][group][cell]].material.color.b += colors[group%16][2];
+						groupCubes.children[GROUPS[id][group][cell]].material.color.b /= group_colors[GROUPS[id][group][cell]];
 						
-						ctx.clearRect(41 + RectX, 41 + RectY + (NumOfVars>4)*30, size-6, size-6);
+						ctx.clearRect(RectX,RectY,size-gap,size-gap);
 						
 						ctx.globalAlpha = 0.7;
-						//console.log('rgb('+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.b*255)+')');
+						//console.log('rgb('+Math.round(groupCubes.children[GROUPS[id][group][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[id][group][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[id][group][cell]].material.color.b*255)+')');
 						
-						//document.getElementById("group").input[type=checkbox].style.color = 'rgb('+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.b*255)+')';
+						//document.getElementById("group").input[type=checkbox].style.color = 'rgb('+Math.round(groupCubes.children[GROUPS[id][group][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[id][group][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[id][group][cell]].material.color.b*255)+')';
 						
-						ctx.fillStyle = 'rgb('+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[group][cell]].material.color.b*255)+')';
+						ctx.fillStyle = 'rgb('+Math.round(groupCubes.children[GROUPS[id][group][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[id][group][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[id][group][cell]].material.color.b*255)+')';
 						
-						ctx.fillRect(41 + RectX,41 + RectY + (NumOfVars>4)*30,size-6,size-6);
+						ctx.fillRect(RectX,RectY,size-gap,size-gap);
 						
 						
 						ctx.globalAlpha = 1;
 						ctx.fillStyle = "black";	
-						ctx.fillText(expression[GROUPS[group][cell]],0.27*size + RectX + 40,RectY + 40 + (NumOfVars>4)*30 + 0.7*size);
+						ctx.fillText(expression[GROUPS[id][group][cell]],RectX+size*.3,RectY+size*.6);
 					}
-					document.getElementById('group').innerHTML += '<p><input type="checkbox" style="color: red" id=group'+group+' name="group' + group + '" value="' + group + '" onchange="onGroupChange(document.KarnaughSets.group' + group + '.value,document.KarnaughSets.group' + group + '.checked)" checked><label for="group'+group+'">' + list_of_groups[group] + '</label><br></p>';
+					document.getElementById('group').innerHTML += '<p><input type="checkbox" id=group'+group+' name="group' + group + '" value="' + group + '" onchange="onGroupChange(document.KarnaughSets.group' + group + '.value,document.KarnaughSets.group' + group + '.checked,'+id+')" checked><label for="group'+group+'">' + list_of_groups[group] + '</label><br></p>';
 				}
 				//console.log(document.KarnaughSets);
 			}
 			
-			function KAL()
+			function ChangeExp(id)
 			{
-				var group_of_groups = calculate();
-				//console.log(GROUPS);
-				GROUPS = group_of_groups[0];
-				if(group_of_groups === 0)
-					return 0;
+				document.getElementById('group').innerHTML = '';
 				ReloadValues();
-				for(var i = 0; i < group_of_groups.length; i++)
-				{
-					list_of_groups = MakeLogExpression(group_of_groups[i]); 
-					document.getElementById("OutputData").innerHTML += "<div id='VarRow'>"+list_of_groups.join(out_br)+"</div>";
-				}
-				Group(); 
+				list_of_groups = MakeLogExpression(GROUPS[id]); 
+				Group(id); 
 			}
 			
-			function onAllGroupsChange()
+			function KAL()
+			{
+				document.getElementById("exps").innerHTML = '';
+				GROUPS = calculate();
+				if(GROUPS === 0)
+					return 0;
+				ReloadValues();
+				for(var i = 0; i < GROUPS.length; i++)
+				{
+					list_of_groups = MakeLogExpression(GROUPS[i]); 
+					document.getElementById("exps").innerHTML += "<input type='radio' name='VarRow' onchange='ChangeExp("+i+");'  id='VarRow"+i+"'><label for='VarRow"+i+"'>"+list_of_groups.join(out_br)+"</label>";
+				}
+				document.getElementById("VarRow0").checked = true;
+				Group(0);
+				
+			}
+			
+			function onAllGroupsChange(id)
 			{
 				
 				var groupCont = document.KarnaughSets;
@@ -310,51 +346,50 @@
 					if(groupCont[checkbox].checked != groupCont.groupAll.checked)
 					{
 						groupCont[checkbox].checked = groupCont.groupAll.checked;
-						onGroupChange(checkbox-3, groupCont.groupAll.checked);
+						onGroupChange(checkbox-3, groupCont.groupAll.checked, id);
 					}
 				}
 			}
 			
-			function onGroupChange(value, checked)
+			function onGroupChange(value, checked,id)
 			{
-				var size = 45;
-				ctx.font = '30px sans-serif';
-				if(NumOfVars > 4)
-				{
-					size = 35;
-					ctx.font = '20px sans-serif';
-				}
 				
-				for(var cell = 0; cell < GROUPS[value].length; cell++) 
+				var size = (4-Math.ceil(NumOfVars/2))*36;// 1,2: 120, 3,4: 80, 5,6: 40	
+				var width = Math.pow(2,Math.ceil(NumOfVars/2));
+				var height = Math.pow(2,Math.floor(NumOfVars/2));
+				var gap = (4-Math.ceil(NumOfVars/2))*5;
+				ctx.font = size/2+'px sans-serif';
+				
+				for(var cell = 0; cell < GROUPS[id][value].length; cell++) 
 				{
-					var RectX = X_shift+poses[NumOfVars-1][GROUPS[value][cell]][0]*size;
-					var RectY = poses[NumOfVars-1][GROUPS[value][cell]][1]*size;
+					var RectX = 210-(width/2 - poses[NumOfVars-1][GROUPS[id][value][cell]][0])*size+gap/2;
+					var RectY = 210-(height/2 - poses[NumOfVars-1][GROUPS[id][value][cell]][1])*size+gap/2;
 
-					groupCubes.children[GROUPS[value][cell]].material.color.r *= group_colors[GROUPS[value][cell]];
-					groupCubes.children[GROUPS[value][cell]].material.color.g *= group_colors[GROUPS[value][cell]];
-					groupCubes.children[GROUPS[value][cell]].material.color.b *= group_colors[GROUPS[value][cell]];
+					groupCubes.children[GROUPS[id][value][cell]].material.color.r *= group_colors[GROUPS[id][value][cell]];
+					groupCubes.children[GROUPS[id][value][cell]].material.color.g *= group_colors[GROUPS[id][value][cell]];
+					groupCubes.children[GROUPS[id][value][cell]].material.color.b *= group_colors[GROUPS[id][value][cell]];
 					
-					groupCubes.children[GROUPS[value][cell]].material.color.r += Math.pow(-1,!checked)*colors[value%16][0];
-					groupCubes.children[GROUPS[value][cell]].material.color.g += Math.pow(-1,!checked)*colors[value%16][1];
-					groupCubes.children[GROUPS[value][cell]].material.color.b += Math.pow(-1,!checked)*colors[value%16][2];
+					groupCubes.children[GROUPS[id][value][cell]].material.color.r += Math.pow(-1,!checked)*colors[value%16][0];
+					groupCubes.children[GROUPS[id][value][cell]].material.color.g += Math.pow(-1,!checked)*colors[value%16][1];
+					groupCubes.children[GROUPS[id][value][cell]].material.color.b += Math.pow(-1,!checked)*colors[value%16][2];
 					
-					group_colors[GROUPS[value][cell]] += Math.pow(-1,!checked);
+					group_colors[GROUPS[id][value][cell]] += Math.pow(-1,!checked);
 						
-					groupCubes.children[GROUPS[value][cell]].material.color.r /= group_colors[GROUPS[value][cell]];
-					groupCubes.children[GROUPS[value][cell]].material.color.g /= group_colors[GROUPS[value][cell]];
-					groupCubes.children[GROUPS[value][cell]].material.color.b /= group_colors[GROUPS[value][cell]];
+					groupCubes.children[GROUPS[id][value][cell]].material.color.r /= group_colors[GROUPS[id][value][cell]];
+					groupCubes.children[GROUPS[id][value][cell]].material.color.g /= group_colors[GROUPS[id][value][cell]];
+					groupCubes.children[GROUPS[id][value][cell]].material.color.b /= group_colors[GROUPS[id][value][cell]];
 					
-					ctx.clearRect(41 + RectX, 41 + RectY + (NumOfVars>4)*30, size-6, size-6);
+					ctx.clearRect(RectX,RectY,size-gap,size-gap);
 						
 					ctx.globalAlpha = 0.7;
-					//console.log('rgb('+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.b*255)+')');
-					ctx.fillStyle = 'rgb('+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[value][cell]].material.color.b*255)+')';
+					//console.log('rgb('+Math.round(groupCubes.children[GROUPS[id][value][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[id][value][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[id][value][cell]].material.color.b*255)+')');
+					ctx.fillStyle = 'rgb('+Math.round(groupCubes.children[GROUPS[id][value][cell]].material.color.r*255)+','+Math.round(groupCubes.children[GROUPS[id][value][cell]].material.color.g*255)+','+Math.round(groupCubes.children[GROUPS[id][value][cell]].material.color.b*255)+')';
 						
-					ctx.fillRect(41 + RectX,41 + RectY + (NumOfVars>4)*30,size-6,size-6);
-						
+					ctx.fillRect(RectX,RectY,size-gap,size-gap);
+					
 					ctx.globalAlpha = 1;
 					ctx.fillStyle = "black";	
-					ctx.fillText(expression[GROUPS[value][cell]],0.27*size + RectX + 40,RectY + 40 + (NumOfVars>4)*30 + 0.7*size);
+					ctx.fillText(expression[GROUPS[id][value][cell]],RectX+size*.3,RectY+size*0.6);
 				}
 			}
 			
@@ -385,7 +420,7 @@
 			//Переинициализация
 			function ReloadKC()
 			{
-				document.getElementById("OutputData").innerHTML = '';
+				document.getElementById("exps").innerHTML = '';
 				NumOfVars = document.DataInput.NumOfVars.value;
 				BinPow = Math.pow(2,NumOfVars);
 				PlaneOpacity = document.KarnaughSets.PlaneOpacity.value;
@@ -394,13 +429,10 @@
 				
 				groupCubes = new THREE.Group();
 				groupPlanes = new THREE.Group();
-				delete Scene;
+				Scene = null;
 				container.removeChild(renderer.domElement);
-				delete container;
-				delete camera;
-				delete renderer;
-				delete ctx;
-				delete canvas;
+				container = null;
+				camera = null;
 				document.getElementById('group').innerHTML = '';
 				init();
 				animate();
@@ -408,8 +440,7 @@
 			
 			//Перезагрузка значений
 			function ReloadValues()
-			{			
-				document.getElementById("OutputData").innerHTML = '';
+			{	
 				NumOfVars = document.DataInput.NumOfVars.value;
 				BinPow = Math.pow(2,NumOfVars);
 				
@@ -417,7 +448,7 @@
 				//expression = '0123456789abcddefghijklmnopqrstuvw000000000000000000000000000000000000000000000000000123456789ABCDEFGHIJKLMNOPQRSTUVW'
 				groupPlanes.children = [];
 				Plane();
-				ctx.clearRect(0,0,400,400);
+				ctx.clearRect(0,0,420,420);
 				drawKarnaughcard(NumOfVars);
 				drawHalfCards(NumOfVars);
 				document.KarnaughSets.PlaneOpacity.value = 0.7;
@@ -428,20 +459,19 @@
 				for(var child = 0; child < BinPow; child++)
 					groupCubes.children[child].material.opacity = 0.7;
 
-				ctx.font = '30px sans-serif';
 				ctx.fillStyle = "black";
 				ctx.globalAlpha = 1; 
 				
+				var size = (4-Math.ceil(NumOfVars/2))*36;// 1,2: 120, 3,4: 80, 5,6: 40	
+				var width = Math.pow(2,Math.ceil(NumOfVars/2));
+				var height = Math.pow(2,Math.floor(NumOfVars/2));
+				var gap = (4-Math.ceil(NumOfVars/2))*5;
+				ctx.font = size/2+'px sans-serif';
 				
-				var size = 45;
-				if(NumOfVars > 4)
-				{
-					size = 35;
-					ctx.font = '20px sans-serif';
-				}
-
 				for(var child = 0; child < BinPow; child++)
 				{
+					var RectX = 210-(width/2 - poses[NumOfVars-1][child][0])*size+gap/2;
+					var RectY = 210-(height/2 - poses[NumOfVars-1][child][1])*size+gap/2;
 					groupCubes.children[child].material.color.r = 0.75;
 					groupCubes.children[child].material.color.g = 0.75;
 					groupCubes.children[child].material.color.b = 0.75;
@@ -456,13 +486,11 @@
 					groupCubes.add(text);
 					
 					//Создание двухмерного текста
-					ctx.fillText(expression[child],X_shift+0.27*size + poses[NumOfVars-1][child][0]*size + 40,poses[NumOfVars-1][child][1]*size + 40 + (NumOfVars>4)*30 + 0.7*size);
+					ctx.fillText(expression[child],RectX+size*.3,RectY+size*0.6);
 				}
 
 				scene.add(groupCubes);
 				scene.add(groupPlanes);
-				delete groupCubes;
-				delete groupPlanes;
 				document.getElementById('group').innerHTML = '';
 			}
 			
@@ -541,7 +569,7 @@
 						var material = new THREE.MeshBasicMaterial({color: 0xc0c0c0/*map: THREE.ImageUtils.loadTexture('cell_texture.jpg')*/, opacity: 0.7,transparent: true});
 						pos[count] += Math.pow(-1,!(shift%Math.pow(2,(NumOfVars-3) + Math.pow(-1,NumOfVars > 4)*count)<Math.pow(2,(NumOfVars-4) + Math.pow(-1,NumOfVars > 4)*count)))*gap_plus_size;
 						group_colors.push(1);
-						cube = new THREE.Mesh(geometry, material);//							  	 							 	  + - + - + - + -				      + + - - + + - - 				     + + + + - - - -
+						cube = new THREE.Mesh(geometry, material);//							  	 							 	  + - + - + - + -					  + + - - + + - - 					 + + + + - - - -
 						cube.renderOrder = 2;
 						cube.position.set(pos[0], pos[1], pos[2]);
 						groupCubes.add(cube);
@@ -654,114 +682,117 @@
 			
 			function drawHalfCards(NumOfVars)
 			{
-				var form = document.DataInput.MM.value-0;
+				var form = document.DataInput.MM.value;
 				var InvSigns = ['','\u0305'];
 				
 				if(form == '0')//Проверка на мкнф
 					InvSigns.reverse();
-				var height = Math.pow(2, Math.floor(NumOfVars/2));
-				var width = Math.pow(2, Math.ceil(NumOfVars/2));
-				var size = 45;
-				if(NumOfVars > 4)
-					size = 35;
+					
+				var UniId = ['\u2080','\u2081','\u2082','\u2083','\u2084','\u2085'];
+				var size = (4-Math.ceil(NumOfVars/2))*36;// 1,2: 120, 3,4: 80, 5,6: 40	
+				var width = Math.pow(2,Math.ceil(NumOfVars/2));
+				var height = Math.pow(2,Math.floor(NumOfVars/2));
+				var gap = (4-Math.ceil(NumOfVars/2))*5;
 				
-				ctx.font = '20px sans-serif';
+				ctx.font = size/2+'px Arial';
+				ctx.globalAlpha = 1;	
 				ctx.fillStyle = "black";
+				ctx.strokeStyle = "3px"
 				ctx.beginPath();			
 				
 				switch(NumOfVars)
 				{
 					case "6":
 						//x5
-						ctx.moveTo(X_shift+80+width*size,70+height*size*0/8);
-						ctx.lineTo(X_shift+80+width*size,70+height*size*1/8 - 5);
-						ctx.fillText('X' + InvSigns[1] + 5,X_shift+80+width*size + 5,70+height*size*1/16 + 5);
+						ctx.moveTo(210+(1+width/2)*size,210-(height/2)*size+gap/2);
+						ctx.lineTo(210+(1+width/2)*size,210-3*(height/8)*size-gap/2);
+						ctx.fillText('X' + InvSigns[1] + UniId[5],210+(1+width/2)*size+gap,210-(height/2)*size+5*gap);
 							
-						ctx.moveTo(X_shift+80+width*size,70+height*size*1/8);
-						ctx.lineTo(X_shift+80+width*size,70+height*size*3/8 - 5);
-						ctx.fillText('X' + InvSigns[0] + 5,X_shift+80+width*size + 5,70+height*size*4/16 + 5);
+						ctx.moveTo(210+(1+width/2)*size,210-3*(height/8)*size+gap/2);
+						ctx.lineTo(210+(1+width/2)*size,210-(height/8)*size-gap/2);
+						ctx.fillText('X' + InvSigns[0] + UniId[5],210+(1+width/2)*size+gap,210-(height/4)*size+2*gap);
 							
-						ctx.moveTo(X_shift+80+width*size,70+height*size*3/8);
-						ctx.lineTo(X_shift+80+width*size,70+height*size*5/8 - 5);
-						ctx.fillText('X' + InvSigns[1] + 5,X_shift+80+width*size + 5,70+height*size*8/16 + 5);
+						ctx.moveTo(210+(1+width/2)*size,210-(height/8)*size+gap/2);
+						ctx.lineTo(210+(1+width/2)*size,210+(height/8)*size-gap/2);
+						ctx.fillText('X' + InvSigns[1] + UniId[5],210+(1+width/2)*size+gap,210+gap/2);
 							
-						ctx.moveTo(X_shift+80+width*size,70+height*size*5/8);
-						ctx.lineTo(X_shift+80+width*size,70+height*size*7/8 - 5);
-						ctx.fillText('X' + InvSigns[0] + 5,X_shift+80+width*size + 5,70+height*size*12/16 + 5);
+						ctx.moveTo(210+(1+width/2)*size,210+(height/8)*size+gap/2);
+						ctx.lineTo(210+(1+width/2)*size,210+3*(height/8)*size-gap/2);
+						ctx.fillText('X' + InvSigns[0] + UniId[5],210+(1+width/2)*size+gap,210+(height/4)*size+2*gap);
 						
-						ctx.moveTo(X_shift+80+width*size,70+height*size*7/8);
-						ctx.lineTo(X_shift+80+width*size,70+height*size*8/8 - 5);
-						ctx.fillText('X' + InvSigns[1] + 5,X_shift+80+width*size + 5,70+height*size*15/16 + 5);
+						ctx.moveTo(210+(1+width/2)*size,210+3*(height/8)*size+gap/2);
+						ctx.lineTo(210+(1+width/2)*size,210+(height/2)*size-gap/2);
+						ctx.fillText('X' + InvSigns[1] + UniId[5],210+(1+width/2)*size+gap,210+(height/2)*size-2*gap);
 							
 					case "5":
 						//x4
-						ctx.moveTo(X_shift+40+width*size*0/8,	35);
-						ctx.lineTo(X_shift+40+width*size*1/8 - 5,35);
-						ctx.fillText('X' + InvSigns[1] + 4,X_shift+40+width*size*1/16 - 10,30);
+						ctx.moveTo(210-(width/2)*size+gap/2,210-(1+height/2)*size+gap);
+						ctx.lineTo(210-3*(width/8)*size-gap/2,210-(1+height/2)*size+gap);
+						ctx.fillText('X' + InvSigns[1] + UniId[4],210-(width/2)*size+2*gap,210-(1+height/2)*size-5+gap);
 						
-						ctx.moveTo(X_shift+40+width*size*1/8,	35);
-						ctx.lineTo(X_shift+40+width*size*3/8 - 5,35);
-						ctx.fillText('X' + InvSigns[0] + 4,X_shift+40+width*size*4/16 - 10,30);
+						ctx.moveTo(210-3*(width/8)*size+gap/2,210-(1+height/2)*size+gap);
+						ctx.lineTo(210-(width/8)*size-gap/2,210-(1+height/2)*size+gap);
+						ctx.fillText('X' + InvSigns[0] + UniId[4],210-(width/4)*size-2*gap,210-(1+height/2)*size-5+gap);
 							
-						ctx.moveTo(X_shift+40+width*size*3/8,	35);
-						ctx.lineTo(X_shift+40+width*size*5/8 - 5,35);
-						ctx.fillText('X' + InvSigns[1] + 4,X_shift+40+width*size*8/16 - 10,30);
+						ctx.moveTo(210-(width/8)*size+gap/2,210-(1+height/2)*size+gap);
+						ctx.lineTo(210+(width/8)*size-gap/2,210-(1+height/2)*size+gap);
+						ctx.fillText('X' + InvSigns[1] + UniId[4],210-2*gap,210-(1+height/2)*size-5+gap);
 							
-						ctx.moveTo(X_shift+40+width*size*5/8,	35);
-						ctx.lineTo(X_shift+40+width*size*7/8 - 5,35);
-						ctx.fillText('X' + InvSigns[0] + 4,X_shift+40+width*size*12/16 - 10,30);
+						ctx.moveTo(210+(width/8)*size+gap/2,210-(1+height/2)*size+gap);
+						ctx.lineTo(210+3*(width/8)*size-gap/2,210-(1+height/2)*size+gap);
+						ctx.fillText('X' + InvSigns[0] + UniId[4],210+(width/4)*size-2*gap,210-(1+height/2)*size-5+gap);
 						
-						ctx.moveTo(X_shift+40+width*size*7/8,	35);
-						ctx.lineTo(X_shift+40+width*size*8/8 - 5,35);
-						ctx.fillText('X' + InvSigns[1] + 4,X_shift+40+width*size*15/16 - 10,30);
+						ctx.moveTo(210+3*(width/8)*size+gap/2,210-(1+height/2)*size+gap);
+						ctx.lineTo(210+(width/2)*size-gap/2,210-(1+height/2)*size+gap);
+						ctx.fillText('X' + InvSigns[1] + UniId[4],210+3*(width/8)*size+2*gap,210-(1+height/2)*size-5+gap);
 					
 					case "4":
 						//x3
-						ctx.moveTo(X_shift+35,40+height*size*0/4 + (NumOfVars>4)*30);
-						ctx.lineTo(X_shift+35,40+height*size*1/4 - 5 + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[1] + 3,X_shift+5,40+height*size*1/8 + (NumOfVars>4)*30);
+						ctx.moveTo(210-(width/2)*size-gap,210-(height/2)*size+gap/2);
+						ctx.lineTo(210-(width/2)*size-gap,210-(height/4)*size-gap/2);
+						ctx.fillText('X' + InvSigns[1] + UniId[3],210-(width/2)*size-size/2-3*gap/2,210-3*(height/8)*size+gap);
 							
-						ctx.moveTo(X_shift+35,40+height*size*1/4 + (NumOfVars>4)*30);
-						ctx.lineTo(X_shift+35,40+height*size*3/4 - 5 + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[0] + 3,X_shift+5,40+height*size*4/8 + (NumOfVars>4)*30);
+						ctx.moveTo(210-(width/2)*size-gap,210-(height/4)*size+gap/2);
+						ctx.lineTo(210-(width/2)*size-gap,210+(height/4)*size-gap/2);
+						ctx.fillText('X' + InvSigns[0] + UniId[3],210-(width/2)*size-size/2-3*gap/2,210+gap/2);
 						
-						ctx.moveTo(X_shift+35,40+height*size*3/4 + (NumOfVars>4)*30);
-						ctx.lineTo(X_shift+35,40+height*size*4/4 - 5 + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[1] + 3,X_shift+5,40+height*size*7/8 + (NumOfVars>4)*30);
+						ctx.moveTo(210-(width/2)*size-gap,210+(height/4)*size+gap/2);
+						ctx.lineTo(210-(width/2)*size-gap,210+(height/2)*size-gap/2);
+						ctx.fillText('X' + InvSigns[1] + UniId[3],210-(width/2)*size-size/2-3*gap/2,210+3*(height/8)*size+gap);
 						
 					case "3":
 						//x2
-						ctx.moveTo(X_shift+40+width*size*0/4,	40+height*size + (NumOfVars>4)*30);
-						ctx.lineTo(X_shift+40+width*size*1/4 - 5,40+height*size + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[1] + 2,X_shift+40+width*size*1/8 - 10,40+height*size + 25 + (NumOfVars>4)*30);
+						ctx.moveTo(210-(width/2)*size+gap/2,210+(height/2)*size+gap);
+						ctx.lineTo(210-(width/4)*size-gap/2,210+(height/2)*size+gap);
+						ctx.fillText('X' + InvSigns[1] + UniId[2],210-3*(width/8)*size-gap,210+(height/2)*size+size/2+gap);
 							
-						ctx.moveTo(X_shift+40+width*size*1/4,	40+height*size + (NumOfVars>4)*30);
-						ctx.lineTo(X_shift+40+width*size*3/4 - 5,40+height*size + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[0] + 2,X_shift+40+width*size*4/8 - 10,40+height*size + 25 + (NumOfVars>4)*30);
+						ctx.moveTo(210-(width/4)*size+gap/2,210+(height/2)*size+gap);
+						ctx.lineTo(210+(width/4)*size-gap/2,210+(height/2)*size+gap);
+						ctx.fillText('X' + InvSigns[0] + UniId[2],210-2*gap,210+(height/2)*size+size/2+gap);
 						
-						ctx.moveTo(X_shift+40+width*size*3/4,	40+height*size + (NumOfVars>4)*30);
-						ctx.lineTo(X_shift+40+width*size*4/4 - 5,40+height*size + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[1] + 2,X_shift+40+width*size*7/8 - 10,40+height*size + 25 + (NumOfVars>4)*30);
+						ctx.moveTo(210+(width/4)*size+gap/2,210+(height/2)*size+gap);
+						ctx.lineTo(210+(width/2)*size-gap/2,210+(height/2)*size+gap);
+						ctx.fillText('X' + InvSigns[1] + UniId[2],210+3*(width/8)*size-gap,210+(height/2)*size+size/2+gap);
 							
 					case "2":
 						//x1
-						ctx.moveTo(X_shift+40+width*size,40+height*size*0/2 + (NumOfVars>4)*30);
-						ctx.lineTo(X_shift+40+width*size,40+height*size*1/2 - 5 + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[0] + 1,X_shift+50+width*size,40+height*size*1/4 + (NumOfVars>4)*30);
+						ctx.moveTo(210+(width/2)*size+gap,210-(height/2)*size+gap/2);
+						ctx.lineTo(210+(width/2)*size+gap,210-gap/2);
+						ctx.fillText('X' + InvSigns[0] + UniId[1],210+(width/2)*size+5+gap,210-(height/4)*size+2*gap);
 							
-						ctx.moveTo(X_shift+40+width*size,40+height*size*1/2 + (NumOfVars>4)*30);
-						ctx.lineTo(X_shift+40+width*size,40+height*size*2/2 - 5 + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[1] + 1,X_shift+50+width*size,40+height*size*3/4 + (NumOfVars>4)*30);
+						ctx.moveTo(210+(width/2)*size+gap,210+gap/2);
+						ctx.lineTo(210+(width/2)*size+gap,210+(height/2)*size-gap/2);
+						ctx.fillText('X' + InvSigns[1] + UniId[1],210+(width/2)*size+5+gap,210+(height/4)*size+2*gap);
 						
 					case "1":
 						//x0
-						ctx.moveTo(X_shift+40+width*size*0/2,35 + (NumOfVars>4)*30);
-						ctx.lineTo(X_shift+40+width*size*1/2 -5,35 + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[0] + 0,X_shift+40+width*size*1/4 - 10,30 + (NumOfVars>4)*30);
+						ctx.moveTo(210-(width/2)*size+gap/2,210-(height/2)*size-gap);
+						ctx.lineTo(210-gap/2,210-(height/2)*size-gap);
+						ctx.fillText('X' + InvSigns[0] + UniId[0],210-(width/4)*size-2*gap,210-(height/2)*size-gap-5);
 						
-						ctx.moveTo(X_shift+40+width*size*1/2,35 + (NumOfVars>4)*30);
-						ctx.lineTo(X_shift+40+width*size*2/2 - 5,35 + (NumOfVars>4)*30);
-						ctx.fillText('X' + InvSigns[1] + 0,X_shift+40+width*size*3/4  + (NumOfVars>5)*5 - 10,30 + (NumOfVars>4)*30);
+						ctx.moveTo(210+gap/2,210-(height/2)*size-gap);
+						ctx.lineTo(210+(width/2)*size-gap/2,210-(height/2)*size-gap);
+						ctx.fillText('X' + InvSigns[1] + UniId[0],210+(width/4)*size-2*gap,210-(height/2)*size-gap-5);
 				}
 				
 				ctx.stroke();
@@ -770,21 +801,16 @@
 
 			function drawKarnaughcard(NumOfVars)
 			{
-				var height = Math.pow(2, Math.floor(NumOfVars/2));
-				var width = Math.pow(2, Math.ceil(NumOfVars/2));
-				var size = 45;
-				if(NumOfVars > 4)
-					size = 35;
-				
-				ctx.globalAlpha = 0.7;
-				ctx.fillStyle = "rgb(192,192,192)";
-				function Cell(pos)// 1,2 - 2; 3,4 - 1
-				{
-					ctx.fillRect(X_shift+pos[0]*size + 40.5,pos[1]*size + 40.5 + (NumOfVars>4)*30, size-5, size-5);
-				}
+				var size = (4-Math.ceil(NumOfVars/2))*36;// 1,2: 120, 3,4: 80, 5,6: 40	
+				var width = Math.pow(2,Math.ceil(NumOfVars/2));
+				var height = Math.pow(2,Math.floor(NumOfVars/2));
+				var gap = (4-Math.ceil(NumOfVars/2))*5;
 
+				ctx.fillStyle = "rgb(192,192,192)";
+				ctx.globalAlpha = 0.7;				
+				
 				for(var i = 0; i < Math.pow(2,NumOfVars); i++)
-					Cell(poses[NumOfVars-1][i]);
+					ctx.fillRect(210-(width/2 - poses[NumOfVars-1][i][0])*size+gap/2,210-(height/2 - poses[NumOfVars-1][i][1])*size+gap/2, size-gap, size-gap);
 			}
  
 			function onDocumentMouseDown(event)
@@ -862,28 +888,6 @@
 				renderer.render(scene, camera);
 			}
 			
-			/*
-
-			…or create a new repository on the command line
-
-
-			echo # Karnaugh >> README.md
-			git init
-			git add README.md
-			git commit -m "first commit"
-			git remote add origin https://github.com/MrPurpleBlack/Karnaugh.git
-			git push -u origin master
-			
-			…or push an existing repository from the command line
-
-			git remote add origin https://github.com/MrPurpleBlack/Karnaugh.git
-			git push -u origin master
-			…or import code from another repository
-
-			You can initialize this repository with code from a Subversion, Mercurial, or TFS project.
-
-			*/
-			
 		</script>
-    </body>
+	</body>
 </html>
