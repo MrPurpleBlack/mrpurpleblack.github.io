@@ -35,7 +35,7 @@ function calculate()
     {
 		var buf = canon_groups.shift();
 		canon_groups.push(buf);
-		for(var iter = 0; iter < NumOfVars+2; iter++)
+		for(var iter = 0; iter < NumOfVars + 2; iter++)
 		{
 			groups = CheckGroups(groups);
 			buf = groups.shift();
@@ -51,14 +51,17 @@ function calculate()
 	
 	list_of_groups = list_of_groups.filter(function(groups){return groups.length == list_of_groups[0].length;});
 	
-	list_of_groups.sort();
+	list_of_groups.sort(function(a,b){return b.toString().length - a.toString().length});
+	
+	list_of_groups = list_of_groups.filter(function(groups){return groups.toString().length == list_of_groups[0].toString().length;});
+	
+	//list_of_groups.sort();
 	list_of_groups.sort(function(a,b){return a.length - b.length});
 	groups = list_of_groups.slice(0,1); 
 	for(i = 1; i < list_of_groups.length; i++)
 		if(list_of_groups[i].toString() != groups[0].toString())
 				groups.unshift(list_of_groups[i])
-
-	return groups.sort();
+	return groups;
 }
 
 function GenerateTruthTable(NumOfVars)

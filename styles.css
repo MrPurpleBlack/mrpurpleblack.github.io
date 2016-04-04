@@ -34,10 +34,10 @@ input[type=radio]
 h1
 {
 	font-family: Georgia;
-	font-size: 40px;	
-	padding-top: 30px;
-	padding-left: 50px;
-	color: #bdbdbd;
+	font-size: 40px;
+	padding: 0px;	
+	padding-top: 40px;
+	color: #f8f8f8;
 	margin: 0;
 	display: inline;
 }
@@ -49,16 +49,31 @@ footer
 	margin: 10px auto;
 	text-align: center;
 }
+td
+{
+	vertical-align: top;
+	padding: 3px;
+	margin: 0;
+	height: 100%;
+}
+
 #logo
 {
 	display: inline-block;
 	position: relative;
 	margin: 0;
 	padding: 0;
-	height: 80px;
-	width: 80px;
+	height: 75px;
+	width: 75px;
 	text-indent: -9999px;
     background: url('logo.png') top left no-repeat;
+}
+
+#header
+{
+	height: 80px;
+	width: 1040px;
+	margin: 0 auto;
 }
 
 
@@ -80,13 +95,6 @@ footer
 		height: 100%;
 		margin: 0px;
 		padding: 0;
-	}
-	.InputTD
-	{
-		vertical-align: top;
-		padding: 3px;
-		margin: 0;
-		height: 100%;
 	}
 	.col
 	{
