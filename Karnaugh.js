@@ -55,12 +55,16 @@ function calculate()
 	
 	list_of_groups = list_of_groups.filter(function(groups){return groups.toString().length == list_of_groups[0].toString().length;});
 	
-	//list_of_groups.sort();
-	list_of_groups.sort(function(a,b){return a.length - b.length});
+	list_of_groups.sort();
+	//list_of_groups.sort(function(a,b){return a.length - b.length});
 	groups = list_of_groups.slice(0,1); 
 	for(i = 1; i < list_of_groups.length; i++)
+	{
+		console.log(list_of_groups[i].toString(),groups[0].toString())
 		if(list_of_groups[i].toString() != groups[0].toString())
 				groups.unshift(list_of_groups[i])
+				
+	}
 	return groups;
 }
 
@@ -218,7 +222,7 @@ function CheckGroups(groups)
             if(!DescCells.ValueInArray(groups[group][cell]))
             {
                 DescCells = DescCells.concat(groups[group])
-                NewGroups.push(groups[group].sort())
+                NewGroups.push(groups[group].sort(function(a,b){return a - b}));
                 break;
             }
         }
