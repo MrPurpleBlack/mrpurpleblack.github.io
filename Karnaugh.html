@@ -172,9 +172,6 @@
 			var mouseY = 0;
 			var mouseYOnMouseDown = 0;
 			
-			var windowHalfX = 75;
-			var windowHalfY = 75;
-			
 			var NumOfVars = document.DataInput.NumOfVars.value;
 			var BinPow = Math.pow(2,NumOfVars);
 			var size = 20;
@@ -828,16 +825,16 @@
 				container.addEventListener('mousemove', onDocumentMouseMove, false);
 				container.addEventListener('mouseup', onDocumentMouseUp, false);
 				container.addEventListener('mouseout', onDocumentMouseOut, false);
-				mouseXOnMouseDown = event.clientX - windowHalfX;
+				mouseXOnMouseDown = event.clientX;
 				targetRotationOnMouseDownX = targetRotationX;
-				mouseYOnMouseDown = event.clientY - windowHalfY;
+				mouseYOnMouseDown = event.clientY;
 				targetRotationOnMouseDownY = targetRotationY;
 			}
  
 			function onDocumentMouseMove(event)
 			{
-				mouseX = event.clientX - windowHalfX;
-				mouseY = event.clientY - windowHalfY;
+				mouseX = event.clientX;
+				mouseY = event.clientY;
 				targetRotationY = targetRotationOnMouseDownY + (mouseY - mouseYOnMouseDown) * 0.02;
 				targetRotationX = targetRotationOnMouseDownX + (mouseX - mouseXOnMouseDown) * 0.02;
 			}
@@ -874,9 +871,9 @@
 				{
 					event.preventDefault();
 					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					targetRotationX = targetRotationOnMouseDownX + (mouseX - mouseXOnMouseDown) * 0.05;
+					targetRotationX = targetRotationOnMouseDownX + (mouseX - mouseXOnMouseDown) * 0.025;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
-					targetRotationY = targetRotationOnMouseDownY + (mouseY - mouseYOnMouseDown) * 0.05;
+					targetRotationY = targetRotationOnMouseDownY + (mouseY - mouseYOnMouseDown) * 0.025;
 				}
 			}
  
@@ -889,11 +886,11 @@
 			function render()
 			{
 				//horizontal rotation   
-				groupCubes.rotation.y += (targetRotationX - groupCubes.rotation.y) * 0.1;
-				groupPlanes.rotation.y += (targetRotationX - groupPlanes.rotation.y) * 0.1;
+				groupCubes.rotation.y += (targetRotationX - groupCubes.rotation.y) * 0.05;
+				groupPlanes.rotation.y += (targetRotationX - groupPlanes.rotation.y) * 0.05;
 				//vertical rotation 
-				groupCubes.rotation.x += (targetRotationY - groupCubes.rotation.x) * 0.05;
-				groupPlanes.rotation.x += (targetRotationY - groupPlanes.rotation.x) * 0.05;
+				groupCubes.rotation.x += (targetRotationY - groupCubes.rotation.x) * 0.025;
+				groupPlanes.rotation.x += (targetRotationY - groupPlanes.rotation.x) * 0.025;
 				renderer.render(scene, camera);
 			}
 			
