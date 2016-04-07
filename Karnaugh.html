@@ -12,10 +12,10 @@
 		<div id="header">
 			<table>
 				<tr>
-					<td style="padding-left: 10px; width:75px;" >
+					<td style="padding: 0 0 0 10px; width:75px;" >
 						<a id="logo">Визуализация карт Карно</a>
 					</td>
-					<td style="padding: 30px 0 0 0;">
+					<td style="padding: 20px 0 0 0;">
 						<h1>Визуальная модель КК</h1>
 					</td>
 				</tr>
@@ -266,20 +266,26 @@
 			//Визуализация групп ячеек 
 			function Group(id)//3 4 5 6
 			{
-				var size = (4-Math.ceil(NumOfVars/2))*36;// 1,2: 120, 3,4: 80, 5,6: 40	
+				var size = (4-Math.ceil(NumOfVars/2))*40;// 1,2: 120, 3,4: 80, 5,6: 40	
 				var width = Math.pow(2,Math.ceil(NumOfVars/2));
 				var height = Math.pow(2,Math.floor(NumOfVars/2));
-				var gap = (4-Math.ceil(NumOfVars/2))*5;
+				var gap = (4-Math.ceil(NumOfVars/2))*3;
+				var x_shift = 210 - 20*(NumOfVars==6);
+				var y_shift = 210 + 10*(NumOfVars==6);
 				list_of_groups = MakeLogExpression(GROUPS[id]); 
 				
 				ctx.font = size/2+'px sans-serif';	
 				document.getElementById('group').innerHTML += '<p><input type="checkbox" name="groupAll" id="groupAll" value="All" onchange="onAllGroupsChange('+id+')" checked><label for="groupAll">Все группы</label><br></p>';
+
+				//АХТУНГ УВАГА ОСТОРОЖНО  КОСТЫЛЬ!!!
+				document.getElementById("group").style.height = (document.getElementById("group").style.height.substr(0,document.getElementById("group").style.height.length-2)-16) +'px';
+				
 				for(var group = 0; group < GROUPS[id].length; group++)
 				{
 					for(var cell = 0; cell < GROUPS[id][group].length; cell++)
 					{
-						var RectX = 210-(width/2 - poses[NumOfVars-1][GROUPS[id][group][cell]][0])*size+gap/2;
-						var RectY = 210-(height/2 - poses[NumOfVars-1][GROUPS[id][group][cell]][1])*size+gap/2;
+						var RectX = x_shift-(width/2 - poses[NumOfVars-1][GROUPS[id][group][cell]][0])*size+gap/2;
+						var RectY = y_shift-(height/2 - poses[NumOfVars-1][GROUPS[id][group][cell]][1])*size+gap/2;
 						
 						groupCubes.children[GROUPS[id][group][cell]].material.color.r *= group_colors[GROUPS[id][group][cell]];
 						groupCubes.children[GROUPS[id][group][cell]].material.color.g *= group_colors[GROUPS[id][group][cell]];
@@ -365,16 +371,18 @@
 			function onGroupChange(value, checked,id)
 			{
 				
-				var size = (4-Math.ceil(NumOfVars/2))*36;// 1,2: 120, 3,4: 80, 5,6: 40	
+				var size = (4-Math.ceil(NumOfVars/2))*40;// 1,2: 120, 3,4: 80, 5,6: 40	
 				var width = Math.pow(2,Math.ceil(NumOfVars/2));
 				var height = Math.pow(2,Math.floor(NumOfVars/2));
-				var gap = (4-Math.ceil(NumOfVars/2))*5;
+				var gap = (4-Math.ceil(NumOfVars/2))*3;
 				ctx.font = size/2+'px sans-serif';
+				var x_shift = 210 - 20*(NumOfVars==6);
+				var y_shift = 210 + 10*(NumOfVars==6);
 				
 				for(var cell = 0; cell < GROUPS[id][value].length; cell++) 
 				{
-					var RectX = 210-(width/2 - poses[NumOfVars-1][GROUPS[id][value][cell]][0])*size+gap/2;
-					var RectY = 210-(height/2 - poses[NumOfVars-1][GROUPS[id][value][cell]][1])*size+gap/2;
+					var RectX = x_shift-(width/2 - poses[NumOfVars-1][GROUPS[id][value][cell]][0])*size+gap/2;
+					var RectY = y_shift-(height/2 - poses[NumOfVars-1][GROUPS[id][value][cell]][1])*size+gap/2;
 
 					groupCubes.children[GROUPS[id][value][cell]].material.color.r *= group_colors[GROUPS[id][value][cell]];
 					groupCubes.children[GROUPS[id][value][cell]].material.color.g *= group_colors[GROUPS[id][value][cell]];
@@ -468,16 +476,18 @@
 				ctx.fillStyle = "black";
 				ctx.globalAlpha = 1; 
 				
-				var size = (4-Math.ceil(NumOfVars/2))*36;// 1,2: 120, 3,4: 80, 5,6: 40	
+				var size = (4-Math.ceil(NumOfVars/2))*40;// 1,2: 120, 3,4: 80, 5,6: 40	
 				var width = Math.pow(2,Math.ceil(NumOfVars/2));
 				var height = Math.pow(2,Math.floor(NumOfVars/2));
-				var gap = (4-Math.ceil(NumOfVars/2))*5;
+				var gap = (4-Math.ceil(NumOfVars/2))*3;
 				ctx.font = size/2+'px sans-serif';
+				var x_shift = 210 - 20*(NumOfVars==6);
+				var y_shift = 210 + 10*(NumOfVars==6);
 				
 				for(var child = 0; child < BinPow; child++)
 				{
-					var RectX = 210-(width/2 - poses[NumOfVars-1][child][0])*size+gap/2;
-					var RectY = 210-(height/2 - poses[NumOfVars-1][child][1])*size+gap/2;
+					var RectX = x_shift-(width/2 - poses[NumOfVars-1][child][0])*size+gap/2;
+					var RectY = y_shift-(height/2 - poses[NumOfVars-1][child][1])*size+gap/2;
 					groupCubes.children[child].material.color.r = 0.75;
 					groupCubes.children[child].material.color.g = 0.75;
 					groupCubes.children[child].material.color.b = 0.75;
@@ -695,10 +705,12 @@
 					InvSigns.reverse();
 					
 				var UniId = ['\u2080','\u2081','\u2082','\u2083','\u2084','\u2085'];
-				var size = (4-Math.ceil(NumOfVars/2))*36;// 1,2: 120, 3,4: 80, 5,6: 40	
+				var size = (4-Math.ceil(NumOfVars/2))*40;// 1,2: 120, 3,4: 80, 5,6: 40	
 				var width = Math.pow(2,Math.ceil(NumOfVars/2));
 				var height = Math.pow(2,Math.floor(NumOfVars/2));
-				var gap = (4-Math.ceil(NumOfVars/2))*5;
+				var gap = (4-Math.ceil(NumOfVars/2))*3;
+				var x_shift = 210 - 20*(NumOfVars==6);
+				var y_shift = 210 + 10*(NumOfVars==6);
 				
 				ctx.font = size/2+'px Arial';
 				ctx.globalAlpha = 1;	
@@ -710,95 +722,95 @@
 				{
 					case "6":
 						//x5
-						ctx.moveTo(210+(1+width/2)*size,210-(height/2)*size+gap/2);
-						ctx.lineTo(210+(1+width/2)*size,210-3*(height/8)*size-gap/2);
-						ctx.fillText('X' + InvSigns[1] + UniId[5],210+(1+width/2)*size+gap,210-(height/2)*size+5*gap);
+						ctx.moveTo(x_shift+(1+width/2)*size,y_shift-(height/2)*size+gap/2);
+						ctx.lineTo(x_shift+(1+width/2)*size,y_shift-3*(height/8)*size-gap/2);
+						ctx.fillText('X' + InvSigns[1] + UniId[5],x_shift+(1+width/2)*size+gap,y_shift-(height/2)*size+5*gap);
 							
-						ctx.moveTo(210+(1+width/2)*size,210-3*(height/8)*size+gap/2);
-						ctx.lineTo(210+(1+width/2)*size,210-(height/8)*size-gap/2);
-						ctx.fillText('X' + InvSigns[0] + UniId[5],210+(1+width/2)*size+gap,210-(height/4)*size+2*gap);
+						ctx.moveTo(x_shift+(1+width/2)*size,y_shift-3*(height/8)*size+gap/2);
+						ctx.lineTo(x_shift+(1+width/2)*size,y_shift-(height/8)*size-gap/2);
+						ctx.fillText('X' + InvSigns[0] + UniId[5],x_shift+(1+width/2)*size+gap,y_shift-(height/4)*size+2*gap);
 							
-						ctx.moveTo(210+(1+width/2)*size,210-(height/8)*size+gap/2);
-						ctx.lineTo(210+(1+width/2)*size,210+(height/8)*size-gap/2);
-						ctx.fillText('X' + InvSigns[1] + UniId[5],210+(1+width/2)*size+gap,210+gap/2);
+						ctx.moveTo(x_shift+(1+width/2)*size,y_shift-(height/8)*size+gap/2);
+						ctx.lineTo(x_shift+(1+width/2)*size,y_shift+(height/8)*size-gap/2);
+						ctx.fillText('X' + InvSigns[1] + UniId[5],x_shift+(1+width/2)*size+gap,y_shift+gap/2);
 							
-						ctx.moveTo(210+(1+width/2)*size,210+(height/8)*size+gap/2);
-						ctx.lineTo(210+(1+width/2)*size,210+3*(height/8)*size-gap/2);
-						ctx.fillText('X' + InvSigns[0] + UniId[5],210+(1+width/2)*size+gap,210+(height/4)*size+2*gap);
+						ctx.moveTo(x_shift+(1+width/2)*size,y_shift+(height/8)*size+gap/2);
+						ctx.lineTo(x_shift+(1+width/2)*size,y_shift+3*(height/8)*size-gap/2);
+						ctx.fillText('X' + InvSigns[0] + UniId[5],x_shift+(1+width/2)*size+gap,y_shift+(height/4)*size+2*gap);
 						
-						ctx.moveTo(210+(1+width/2)*size,210+3*(height/8)*size+gap/2);
-						ctx.lineTo(210+(1+width/2)*size,210+(height/2)*size-gap/2);
-						ctx.fillText('X' + InvSigns[1] + UniId[5],210+(1+width/2)*size+gap,210+(height/2)*size-2*gap);
+						ctx.moveTo(x_shift+(1+width/2)*size,y_shift+3*(height/8)*size+gap/2);
+						ctx.lineTo(x_shift+(1+width/2)*size,y_shift+(height/2)*size-gap/2);
+						ctx.fillText('X' + InvSigns[1] + UniId[5],x_shift+(1+width/2)*size+gap,y_shift+(height/2)*size-2*gap);
 							
 					case "5":
 						//x4
-						ctx.moveTo(210-(width/2)*size+gap/2,210-(1+height/2)*size+gap);
-						ctx.lineTo(210-3*(width/8)*size-gap/2,210-(1+height/2)*size+gap);
-						ctx.fillText('X' + InvSigns[1] + UniId[4],210-(width/2)*size+2*gap,210-(1+height/2)*size-5+gap);
+						ctx.moveTo(x_shift-(width/2)*size+gap/2,y_shift-(1+height/2)*size+gap);
+						ctx.lineTo(x_shift-3*(width/8)*size-gap/2,y_shift-(1+height/2)*size+gap);
+						ctx.fillText('X' + InvSigns[1] + UniId[4],x_shift-(width/2)*size+2*gap,y_shift-(1+height/2)*size-5+gap);
 						
-						ctx.moveTo(210-3*(width/8)*size+gap/2,210-(1+height/2)*size+gap);
-						ctx.lineTo(210-(width/8)*size-gap/2,210-(1+height/2)*size+gap);
-						ctx.fillText('X' + InvSigns[0] + UniId[4],210-(width/4)*size-2*gap,210-(1+height/2)*size-5+gap);
+						ctx.moveTo(x_shift-3*(width/8)*size+gap/2,y_shift-(1+height/2)*size+gap);
+						ctx.lineTo(x_shift-(width/8)*size-gap/2,y_shift-(1+height/2)*size+gap);
+						ctx.fillText('X' + InvSigns[0] + UniId[4],x_shift-(width/4)*size-2*gap,y_shift-(1+height/2)*size-5+gap);
 							
-						ctx.moveTo(210-(width/8)*size+gap/2,210-(1+height/2)*size+gap);
-						ctx.lineTo(210+(width/8)*size-gap/2,210-(1+height/2)*size+gap);
-						ctx.fillText('X' + InvSigns[1] + UniId[4],210-2*gap,210-(1+height/2)*size-5+gap);
+						ctx.moveTo(x_shift-(width/8)*size+gap/2,y_shift-(1+height/2)*size+gap);
+						ctx.lineTo(x_shift+(width/8)*size-gap/2,y_shift-(1+height/2)*size+gap);
+						ctx.fillText('X' + InvSigns[1] + UniId[4],x_shift-2*gap,y_shift-(1+height/2)*size-5+gap);
 							
-						ctx.moveTo(210+(width/8)*size+gap/2,210-(1+height/2)*size+gap);
-						ctx.lineTo(210+3*(width/8)*size-gap/2,210-(1+height/2)*size+gap);
-						ctx.fillText('X' + InvSigns[0] + UniId[4],210+(width/4)*size-2*gap,210-(1+height/2)*size-5+gap);
+						ctx.moveTo(x_shift+(width/8)*size+gap/2,y_shift-(1+height/2)*size+gap);
+						ctx.lineTo(x_shift+3*(width/8)*size-gap/2,y_shift-(1+height/2)*size+gap);
+						ctx.fillText('X' + InvSigns[0] + UniId[4],x_shift+(width/4)*size-2*gap,y_shift-(1+height/2)*size-5+gap);
 						
-						ctx.moveTo(210+3*(width/8)*size+gap/2,210-(1+height/2)*size+gap);
-						ctx.lineTo(210+(width/2)*size-gap/2,210-(1+height/2)*size+gap);
-						ctx.fillText('X' + InvSigns[1] + UniId[4],210+3*(width/8)*size+2*gap,210-(1+height/2)*size-5+gap);
+						ctx.moveTo(x_shift+3*(width/8)*size+gap/2,y_shift-(1+height/2)*size+gap);
+						ctx.lineTo(x_shift+(width/2)*size-gap/2,y_shift-(1+height/2)*size+gap);
+						ctx.fillText('X' + InvSigns[1] + UniId[4],x_shift+3*(width/8)*size+2*gap,y_shift-(1+height/2)*size-5+gap);
 					
 					case "4":
 						//x3
-						ctx.moveTo(210-(width/2)*size-gap,210-(height/2)*size+gap/2);
-						ctx.lineTo(210-(width/2)*size-gap,210-(height/4)*size-gap/2);
-						ctx.fillText('X' + InvSigns[1] + UniId[3],210-(width/2)*size-size/2-3*gap/2,210-3*(height/8)*size+gap);
+						ctx.moveTo(x_shift-(width/2)*size-gap,y_shift-(height/2)*size+gap/2);
+						ctx.lineTo(x_shift-(width/2)*size-gap,y_shift-(height/4)*size-gap/2);
+						ctx.fillText('X' + InvSigns[1] + UniId[3],x_shift-(width/2)*size-size/2-3*gap/2,y_shift-3*(height/8)*size+gap);
 							
-						ctx.moveTo(210-(width/2)*size-gap,210-(height/4)*size+gap/2);
-						ctx.lineTo(210-(width/2)*size-gap,210+(height/4)*size-gap/2);
-						ctx.fillText('X' + InvSigns[0] + UniId[3],210-(width/2)*size-size/2-3*gap/2,210+gap/2);
+						ctx.moveTo(x_shift-(width/2)*size-gap,y_shift-(height/4)*size+gap/2);
+						ctx.lineTo(x_shift-(width/2)*size-gap,y_shift+(height/4)*size-gap/2);
+						ctx.fillText('X' + InvSigns[0] + UniId[3],x_shift-(width/2)*size-size/2-3*gap/2,y_shift+gap/2);
 						
-						ctx.moveTo(210-(width/2)*size-gap,210+(height/4)*size+gap/2);
-						ctx.lineTo(210-(width/2)*size-gap,210+(height/2)*size-gap/2);
-						ctx.fillText('X' + InvSigns[1] + UniId[3],210-(width/2)*size-size/2-3*gap/2,210+3*(height/8)*size+gap);
+						ctx.moveTo(x_shift-(width/2)*size-gap,y_shift+(height/4)*size+gap/2);
+						ctx.lineTo(x_shift-(width/2)*size-gap,y_shift+(height/2)*size-gap/2);
+						ctx.fillText('X' + InvSigns[1] + UniId[3],x_shift-(width/2)*size-size/2-3*gap/2,y_shift+3*(height/8)*size+gap);
 						
 					case "3":
 						//x2
-						ctx.moveTo(210-(width/2)*size+gap/2,210+(height/2)*size+gap);
-						ctx.lineTo(210-(width/4)*size-gap/2,210+(height/2)*size+gap);
-						ctx.fillText('X' + InvSigns[1] + UniId[2],210-3*(width/8)*size-gap,210+(height/2)*size+size/2+gap);
+						ctx.moveTo(x_shift-(width/2)*size+gap/2,y_shift+(height/2)*size+gap);
+						ctx.lineTo(x_shift-(width/4)*size-gap/2,y_shift+(height/2)*size+gap);
+						ctx.fillText('X' + InvSigns[1] + UniId[2],x_shift-3*(width/8)*size-gap,y_shift+(height/2)*size+size/2+gap);
 							
-						ctx.moveTo(210-(width/4)*size+gap/2,210+(height/2)*size+gap);
-						ctx.lineTo(210+(width/4)*size-gap/2,210+(height/2)*size+gap);
-						ctx.fillText('X' + InvSigns[0] + UniId[2],210-2*gap,210+(height/2)*size+size/2+gap);
+						ctx.moveTo(x_shift-(width/4)*size+gap/2,y_shift+(height/2)*size+gap);
+						ctx.lineTo(x_shift+(width/4)*size-gap/2,y_shift+(height/2)*size+gap);
+						ctx.fillText('X' + InvSigns[0] + UniId[2],x_shift-2*gap,y_shift+(height/2)*size+size/2+gap);
 						
-						ctx.moveTo(210+(width/4)*size+gap/2,210+(height/2)*size+gap);
-						ctx.lineTo(210+(width/2)*size-gap/2,210+(height/2)*size+gap);
-						ctx.fillText('X' + InvSigns[1] + UniId[2],210+3*(width/8)*size-gap,210+(height/2)*size+size/2+gap);
+						ctx.moveTo(x_shift+(width/4)*size+gap/2,y_shift+(height/2)*size+gap);
+						ctx.lineTo(x_shift+(width/2)*size-gap/2,y_shift+(height/2)*size+gap);
+						ctx.fillText('X' + InvSigns[1] + UniId[2],x_shift+3*(width/8)*size-gap,y_shift+(height/2)*size+size/2+gap);
 							
 					case "2":
 						//x1
-						ctx.moveTo(210+(width/2)*size+gap,210-(height/2)*size+gap/2);
-						ctx.lineTo(210+(width/2)*size+gap,210-gap/2);
-						ctx.fillText('X' + InvSigns[0] + UniId[1],210+(width/2)*size+5+gap,210-(height/4)*size+2*gap);
+						ctx.moveTo(x_shift+(width/2)*size+gap,y_shift-(height/2)*size+gap/2);
+						ctx.lineTo(x_shift+(width/2)*size+gap,y_shift-gap/2);
+						ctx.fillText('X' + InvSigns[0] + UniId[1],x_shift+(width/2)*size+5+gap,y_shift-(height/4)*size+2*gap);
 							
-						ctx.moveTo(210+(width/2)*size+gap,210+gap/2);
-						ctx.lineTo(210+(width/2)*size+gap,210+(height/2)*size-gap/2);
-						ctx.fillText('X' + InvSigns[1] + UniId[1],210+(width/2)*size+5+gap,210+(height/4)*size+2*gap);
+						ctx.moveTo(x_shift+(width/2)*size+gap,y_shift+gap/2);
+						ctx.lineTo(x_shift+(width/2)*size+gap,y_shift+(height/2)*size-gap/2);
+						ctx.fillText('X' + InvSigns[1] + UniId[1],x_shift+(width/2)*size+5+gap,y_shift+(height/4)*size+2*gap);
 						
 					case "1":
 						//x0
-						ctx.moveTo(210-(width/2)*size+gap/2,210-(height/2)*size-gap);
-						ctx.lineTo(210-gap/2,210-(height/2)*size-gap);
-						ctx.fillText('X' + InvSigns[0] + UniId[0],210-(width/4)*size-2*gap,210-(height/2)*size-gap-5);
+						ctx.moveTo(x_shift-(width/2)*size+gap/2,y_shift-(height/2)*size-gap);
+						ctx.lineTo(x_shift-gap/2,y_shift-(height/2)*size-gap);
+						ctx.fillText('X' + InvSigns[0] + UniId[0],x_shift-(width/4)*size-2*gap,y_shift-(height/2)*size-gap-5);
 						
-						ctx.moveTo(210+gap/2,210-(height/2)*size-gap);
-						ctx.lineTo(210+(width/2)*size-gap/2,210-(height/2)*size-gap);
-						ctx.fillText('X' + InvSigns[1] + UniId[0],210+(width/4)*size-2*gap,210-(height/2)*size-gap-5);
+						ctx.moveTo(x_shift+gap/2,y_shift-(height/2)*size-gap);
+						ctx.lineTo(x_shift+(width/2)*size-gap/2,y_shift-(height/2)*size-gap);
+						ctx.fillText('X' + InvSigns[1] + UniId[0],x_shift+(width/4)*size-2*gap,y_shift-(height/2)*size-gap-5);
 				}
 				
 				ctx.stroke();
@@ -807,16 +819,18 @@
 
 			function drawKarnaughcard(NumOfVars)
 			{
-				var size = (4-Math.ceil(NumOfVars/2))*36;// 1,2: 120, 3,4: 80, 5,6: 40	
+				var size = (4-Math.ceil(NumOfVars/2))*40;// 1,2: 120, 3,4: 80, 5,6: 40	
 				var width = Math.pow(2,Math.ceil(NumOfVars/2));
 				var height = Math.pow(2,Math.floor(NumOfVars/2));
-				var gap = (4-Math.ceil(NumOfVars/2))*5;
-
+				var gap = (4-Math.ceil(NumOfVars/2))*3;
+				var x_shift = 210 - 20*(NumOfVars==6);
+				var y_shift = 210 + 10*(NumOfVars==6);
+				
 				ctx.fillStyle = "rgb(192,192,192)";
 				ctx.globalAlpha = 0.7;				
 				
 				for(var i = 0; i < Math.pow(2,NumOfVars); i++)
-					ctx.fillRect(210-(width/2 - poses[NumOfVars-1][i][0])*size+gap/2,210-(height/2 - poses[NumOfVars-1][i][1])*size+gap/2, size-gap, size-gap);
+					ctx.fillRect(x_shift-(width/2 - poses[NumOfVars-1][i][0])*size+gap/2,y_shift-(height/2 - poses[NumOfVars-1][i][1])*size+gap/2, size-gap, size-gap);
 			}
  
 			function onDocumentMouseDown(event)
@@ -871,9 +885,9 @@
 				{
 					event.preventDefault();
 					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					targetRotationX = targetRotationOnMouseDownX + (mouseX - mouseXOnMouseDown) * 0.025;
+					targetRotationX = targetRotationOnMouseDownX + (mouseX - mouseXOnMouseDown) * 0.04;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
-					targetRotationY = targetRotationOnMouseDownY + (mouseY - mouseYOnMouseDown) * 0.025;
+					targetRotationY = targetRotationOnMouseDownY + (mouseY - mouseYOnMouseDown) * 0.04;
 				}
 			}
  

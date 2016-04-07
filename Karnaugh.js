@@ -59,12 +59,9 @@ function calculate()
 	//list_of_groups.sort(function(a,b){return a.length - b.length});
 	groups = list_of_groups.slice(0,1); 
 	for(i = 1; i < list_of_groups.length; i++)
-	{
-		console.log(list_of_groups[i].toString(),groups[0].toString())
 		if(list_of_groups[i].toString() != groups[0].toString())
 				groups.unshift(list_of_groups[i])
 				
-	}
 	return groups;
 }
 
@@ -106,6 +103,7 @@ function ValNumChange(NumOfVars)
     var x= 19*BinPow;
     Data.exp.style.height = x + 2 + 'px';
     Data.TruthTable.style.height = '810px';
+	document.getElementById("group").style.height = '750px';
 	if(NumOfVars>5)
 	{
 		Data.TruthTable.style.height = x + 'px';

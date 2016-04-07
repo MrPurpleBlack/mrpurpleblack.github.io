@@ -1,7 +1,7 @@
 header
 {
     background: #454545;
-    height: 80px;
+    height: 64px;
 }
 fieldset
 {
@@ -63,10 +63,10 @@ td
 	position: relative;
 	margin: 0;
 	padding: 0;
-	height: 75px;
-	width: 75px;
+	height: 64px;
+	width: 64px;
 	text-indent: -9999px;
-    background: url('logo.png') top left no-repeat;
+    background: url('logo.png') top no-repeat;
 }
 
 #header
