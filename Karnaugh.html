@@ -277,7 +277,7 @@
 				ctx.font = size/2+'px sans-serif';	
 				document.getElementById('group').innerHTML += '<p><input type="checkbox" name="groupAll" id="groupAll" value="All" onchange="onAllGroupsChange('+id+')" checked><label for="groupAll">Все группы</label><br></p>';
 
-				//АХТУНГ УВАГА ОСТОРОЖНО  КОСТЫЛЬ!!!
+				//АХТУНГ УВАГА ОСТОРОЖНО КОСТЫЛЬ!!!
 				document.getElementById("group").style.height = (document.getElementById("group").style.height.substr(0,document.getElementById("group").style.height.length-2)-16) +'px';
 				
 				for(var group = 0; group < GROUPS[id].length; group++)
